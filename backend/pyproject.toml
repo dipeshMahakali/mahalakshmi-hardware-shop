@@ -1,0 +1,19 @@
+[project]
+name = "carpenter-partner-api"
+version = "0.1.0"
+description = "Core business API for the Carpenter Partner Ecosystem"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115,<1",
+  "uvicorn[standard]>=0.30,<1",
+  "sqlalchemy>=2.0,<3",
+  "alembic>=1.13,<2",
+  "pydantic-settings>=2.6,<3",
+  "python-jose[cryptography]>=3.3,<4",
+  "pwdlib[argon2]>=0.2,<1",
+  "psycopg[binary]>=3.2,<4",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
