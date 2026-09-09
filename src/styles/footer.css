@@ -1,0 +1,214 @@
+/* ==========================================================================
+   FOOTER & MOBILE BOTTOM NAVIGATION STYLES
+   ========================================================================== */
+
+/* Main Footer Container */
+.site-footer {
+  background-color: #121315;
+  color: var(--color-text-inverse);
+  padding-top: var(--space-16);
+  padding-bottom: var(--space-8);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr;
+  gap: var(--space-10);
+  margin-bottom: var(--space-12);
+}
+
+.footer-brand-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-brand-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.footer-brand-logo .logo-title-main {
+  color: var(--color-text-inverse);
+}
+
+.footer-about-text {
+  font-size: var(--fs-sm);
+  color: var(--color-text-inverse-muted);
+  line-height: 1.6;
+  margin-bottom: var(--space-6);
+  max-width: 320px;
+}
+
+.footer-trust-badges {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.footer-badge-pill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-gold);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Footer Column Headings & Links */
+.footer-col-title {
+  font-size: var(--fs-md);
+  font-weight: 800;
+  color: var(--color-text-inverse);
+  margin-bottom: var(--space-5);
+  letter-spacing: -0.01em;
+}
+
+.footer-links-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.footer-link, .footer-link-btn {
+  font-size: var(--fs-sm);
+  color: var(--color-text-inverse-muted);
+  transition: color var(--transition-fast), transform var(--transition-fast);
+  display: inline-flex;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.footer-link:hover, .footer-link-btn:hover {
+  color: var(--color-accent);
+  transform: translateX(3px);
+}
+
+
+/* Footer Contact Details */
+.footer-contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.footer-contact-item {
+  display: flex;
+  gap: var(--space-3);
+  font-size: var(--fs-sm);
+  color: var(--color-text-inverse-muted);
+  line-height: 1.4;
+}
+
+.footer-contact-item svg {
+  color: var(--color-accent);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Bottom Bar Dividers & Copyright */
+.footer-bottom-bar {
+  padding-top: var(--space-8);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  font-size: var(--fs-xs);
+  color: var(--color-text-inverse-muted);
+}
+
+.footer-legal-links {
+  display: flex;
+  gap: var(--space-6);
+}
+
+.footer-legal-link:hover {
+  color: var(--color-accent);
+}
+
+.payment-badges-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.payment-badge {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 3px var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 800;
+  color: #CBD5E1;
+}
+
+/* MOBILE FIXED BOTTOM NAVIGATION BAR */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: var(--z-sticky);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.mobile-bottom-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  height: 100%;
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--color-text-inverse-muted);
+  font-size: 10px;
+  font-weight: 600;
+  position: relative;
+  transition: color var(--transition-fast);
+}
+
+.mobile-nav-item.is-active, .mobile-nav-item:hover {
+  color: var(--color-accent);
+}
+
+@media (max-width: 1024px) {
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .site-footer {
+    padding-bottom: 80px; /* Space for bottom nav */
+  }
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+  .footer-bottom-bar {
+    flex-direction: column;
+    text-align: center;
+  }
+  .mobile-bottom-nav {
+    display: block;
+  }
+}

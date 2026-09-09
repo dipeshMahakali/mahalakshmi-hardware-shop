@@ -1,0 +1,683 @@
+/* ==========================================================================
+   SHREE MAHALAXMI HARDWARE — PRODUCT CATALOG DATA
+   (Strictly no third-party manufacturer brand names)
+   ========================================================================== */
+
+export const PRODUCTS = [
+  // DOOR HARDWARE
+  {
+    id: 'smh-001',
+    name: 'Verona Satin Brass Mortise Handle Set',
+    category: 'Door Hardware',
+    categoryId: 'door-hardware',
+    subtitle: '12 Inch Premium Finish • Solid Brass Core',
+    price: 1250,
+    originalPrice: 1600,
+    discountPercentage: 22,
+    rating: 4.9,
+    reviewCount: 48,
+    badge: 'BESTSELLER',
+    badgeType: 'bestseller',
+    inStock: true,
+    sku: 'SMH-DH-1021',
+    material: 'Solid Forged Brass',
+    finish: 'Satin Gold / Brushed Brass',
+    dimensions: '300mm x 55mm x 65mm',
+    warranty: '10 Years Mechanical Warranty',
+    description: 'Precision engineered architectural mortise handle crafted from high-density solid forged brass. Features double-action spring return and anti-corrosion clear PVD coating.',
+    features: [
+      'Dual spring mechanism prevents handle sag',
+      'Tested to over 200,000 operational cycles',
+      'Corrosion resistant PVD electroplated finish',
+      'Includes matching escutcheon keyhole plates'
+    ],
+    type: 'handle_lever'
+  },
+  {
+    id: 'smh-007',
+    name: 'Stirling Heavy Duty Stainless Steel Tower Bolt',
+    category: 'Door Hardware',
+    categoryId: 'door-hardware',
+    subtitle: '12 Inch Length • Solid SS 304 Rod',
+    price: 320,
+    originalPrice: 400,
+    discountPercentage: 20,
+    rating: 4.6,
+    reviewCount: 32,
+    badge: 'SALE',
+    badgeType: 'discount',
+    inStock: true,
+    sku: 'SMH-TB-1200',
+    material: 'Stainless Steel Grade 304',
+    finish: 'Brushed Satin Stainless',
+    dimensions: '300mm (12 Inch) x 38mm Width',
+    warranty: 'Lifetime Anti-Rust Guarantee',
+    description: 'Heavy-gauge solid stainless steel tower bolt designed for secondary security on main entry doors, gates, and heavy wooden shutters.',
+    features: [
+      '10mm thick solid SS 304 shooting rod',
+      'Precision countersunk screw holes',
+      'Smooth sliding action with brass detent ball',
+      'Includes heavy-duty strike plate'
+    ],
+    type: 'tower_bolt'
+  },
+  {
+    id: 'smh-008',
+    name: 'Modern Cylindrical Solid Brass Door Stopper',
+    category: 'Door Hardware',
+    categoryId: 'door-hardware',
+    subtitle: 'Floor Mounted • Heavy Rubber Bumper Ring',
+    price: 210,
+    originalPrice: 250,
+    discountPercentage: 16,
+    rating: 4.9,
+    reviewCount: 41,
+    badge: 'HOT',
+    badgeType: 'hot',
+    inStock: true,
+    sku: 'SMH-DS-050',
+    material: 'Solid Brass & High-Density Rubber',
+    finish: 'Antique Brass & Black Rubber',
+    dimensions: '45mm Diameter x 40mm Height',
+    warranty: '5 Years Warranty',
+    description: 'Heavyweight architectural floor door stop with sound-dampening vulcanized rubber buffer ring to shield walls and door handles from impacts.',
+    features: [
+      'Solid brass body prevents bending or snapping',
+      'High-impact shock absorbing rubber ring',
+      'Concealed floor anchor screw installation',
+      'Suitable for marble, tile, and hardwood flooring'
+    ],
+    type: 'door_stopper'
+  },
+  {
+    id: 'smh-010',
+    name: 'Hydraulic Automatic Commercial Door Closer',
+    category: 'Door Hardware',
+    categoryId: 'door-hardware',
+    subtitle: 'Heavy Duty 80KG Load • Adjustable Speed',
+    price: 1450,
+    originalPrice: 1800,
+    discountPercentage: 19,
+    rating: 4.7,
+    reviewCount: 54,
+    badge: 'HEAVY DUTY',
+    badgeType: 'bestseller',
+    inStock: true,
+    sku: 'SMH-DC-800',
+    material: 'Die-Cast Aluminum Alloy Body',
+    finish: 'Silver Metallic Enamel',
+    dimensions: '180mm x 40mm x 63mm',
+    warranty: '5 Years Commercial Warranty',
+    description: 'Universal hydraulic overhead door closer engineered for commercial & residential entry doors up to 80kg weight. Dual valves for separate closing & latching speed adjustments.',
+    features: [
+      'Tested to 500,000 EN1154 certification cycles',
+      'Dual valve closing and latching speed control',
+      'Reversible left/right hand door installation',
+      'High-grade heat treated internal spring'
+    ],
+    type: 'door_closer'
+  },
+  {
+    id: 'smh-012',
+    name: 'Wide-Angle 180° HD Optical Door Viewer Eye',
+    category: 'Door Hardware',
+    categoryId: 'door-hardware',
+    subtitle: 'Heavy Brass Barrel • Heavy Privacy Shutter',
+    price: 120,
+    originalPrice: 150,
+    discountPercentage: 20,
+    rating: 4.6,
+    reviewCount: 67,
+    badge: '20% OFF',
+    badgeType: 'discount',
+    inStock: true,
+    sku: 'SMH-DV-180',
+    material: 'Solid Machined Brass & Optical Glass',
+    finish: 'Satin Chrome Plated',
+    dimensions: '16mm Barrel Diameter (Fits 35-60mm doors)',
+    warranty: '5 Years Warranty',
+    description: 'Precision crystal optical glass lens door spy hole offering clear 180-degree panoramic view. Integrated back privacy shutter prevents reverse viewing from outside.',
+    features: [
+      'High-clarity multi-layer optical glass lenses',
+      'Integrated internal privacy shutter cover',
+      'Adjustable thread fits standard 35-60mm doors',
+      'Vandal-proof brass outer shell'
+    ],
+    type: 'door_viewer'
+  },
+  {
+    id: 'smh-013',
+    name: 'AeroPull Solid Brass Main Door Entrance Handle',
+    category: 'Door Hardware',
+    categoryId: 'door-hardware',
+    subtitle: '24 Inch Back-to-Back Pull Handle',
+    price: 3400,
+    originalPrice: 4200,
+    discountPercentage: 19,
+    rating: 4.9,
+    reviewCount: 22,
+    badge: 'LUXURY',
+    badgeType: 'bestseller',
+    inStock: true,
+    sku: 'SMH-DH-2400',
+    material: 'Solid Forged Brass',
+    finish: 'Brushed Gold & Matte Black Accent',
+    dimensions: '600mm (24 Inches) Length',
+    warranty: '10 Years Warranty',
+    description: 'Grand entrance main door pull handle crafted from heavy forged brass. Designed for thick timber, glass, or metal entry doors with back-to-back mounting hardware.',
+    features: [
+      'Ergonomic tubular design with tactile grip',
+      'Heavy duty mounting bolts with rubber washers',
+      'Resists weathering and saltwater corrosion'
+    ],
+    type: 'handle_lever_gold'
+  },
+
+  // HANDLES
+  {
+    id: 'smh-005',
+    name: 'Elegance Satin Gold Architectural Lever Handle',
+    category: 'Handles',
+    categoryId: 'handles',
+    subtitle: 'Ergonomic Curved Profile • Rose Mount',
+    price: 2250,
+    originalPrice: 2700,
+    discountPercentage: 17,
+    rating: 4.9,
+    reviewCount: 29,
+    badge: 'NEW',
+    badgeType: 'new',
+    inStock: true,
+    sku: 'SMH-HD-9090',
+    material: 'Solid Brass Alloy',
+    finish: 'Brushed Satin Gold PVD',
+    dimensions: '140mm Handle Length x 52mm Rose',
+    warranty: '10 Years Finish Warranty',
+    description: 'Contemporary designer lever handle with round rose mounting plate. Hand-buffed satin gold finish with nano-sealed fingerprint resistant coating.',
+    features: [
+      'Minimalist flush circular rose plate attachment',
+      'Comfort-grip organic contoured handle bar',
+      'Heavy-duty internal steel spring assembly',
+      'Suitable for wood, glass, and composite doors'
+    ],
+    type: 'handle_lever_gold'
+  },
+  {
+    id: 'smh-014',
+    name: 'Verona Satin Chrome Mortise Plate Handle',
+    category: 'Handles',
+    categoryId: 'handles',
+    subtitle: '10 Inch Rectangular Plate • Key Hole Cutout',
+    price: 1150,
+    originalPrice: 1400,
+    discountPercentage: 18,
+    rating: 4.7,
+    reviewCount: 38,
+    badge: 'BESTSELLER',
+    badgeType: 'bestseller',
+    inStock: true,
+    sku: 'SMH-HD-1000',
+    material: 'Zinc Alloy Core',
+    finish: 'Satin Nickel Chrome',
+    dimensions: '250mm x 45mm x 55mm',
+    warranty: '5 Years Warranty',
+    description: 'Classic rectangular mortise backplate handle set. Includes smooth return spring mechanism and matching spindle rod.',
+    features: [
+      'Dual side handle plates with keyhole cutouts',
+      'Corrosion resistant electroplated chrome finish'
+    ],
+    type: 'handle_lever'
+  },
+  {
+    id: 'smh-015',
+    name: 'Minimalist Square Rose Lever Handle (Matte Black)',
+    category: 'Handles',
+    categoryId: 'handles',
+    subtitle: 'Modern Square Profile • Matte Black Finish',
+    price: 1890,
+    originalPrice: 2300,
+    discountPercentage: 18,
+    rating: 4.8,
+    reviewCount: 44,
+    badge: 'TRENDING',
+    badgeType: 'hot',
+    inStock: true,
+    sku: 'SMH-HD-4040',
+    material: 'Solid Zinc Alloy',
+    finish: 'Electroplated Matte Black',
+    dimensions: '135mm Length x 50mm Square Rose',
+    warranty: '7 Years Warranty',
+    description: 'Ultra-modern square rose lever handle featuring crisp geometric lines and velvety matte black finish.',
+    features: [
+      'Concealed screw square rose mounting',
+      'Resists smudges, oil, and corrosion'
+    ],
+    type: 'handle_lever'
+  },
+
+  // LOCKS & SECURITY
+  {
+    id: 'smh-002',
+    name: 'AeroSlim Biometric Digital Smart Lock',
+    category: 'Locks & Security',
+    categoryId: 'locks-security',
+    subtitle: 'Touchscreen Keypad • Fingerprint • RFID',
+    price: 12990,
+    originalPrice: 15300,
+    discountPercentage: 15,
+    rating: 5.0,
+    reviewCount: 35,
+    badge: '15% OFF',
+    badgeType: 'discount',
+    inStock: true,
+    sku: 'SMH-SL-8800',
+    material: 'Zinc Alloy & Tempered Glass',
+    finish: 'Matte Obsidian Black',
+    dimensions: '380mm x 75mm x 25mm',
+    warranty: '3 Years Warranty + Free Onsite Demo',
+    description: 'Next-generation smart security lock featuring 0.3s optical fingerprint recognition, anti-peep passcode technology, encrypted smart card reader, and emergency mechanical key bypass.',
+    features: [
+      '360° Semiconductor live fingerprint reader',
+      'Auto-locking heavy-duty triple bolt mortise',
+      'Emergency Type-C power input port',
+      'Virtual password anti-peep functionality'
+    ],
+    type: 'smart_lock'
+  },
+  {
+    id: 'smh-006',
+    name: 'Fortress Solid Brass Security Deadbolt Lock',
+    category: 'Locks & Security',
+    categoryId: 'locks-security',
+    subtitle: '60mm Key Alike Mechanism • Anti-Pick Pin',
+    price: 399,
+    originalPrice: 500,
+    discountPercentage: 20,
+    rating: 4.8,
+    reviewCount: 91,
+    badge: 'BESTSELLER',
+    badgeType: 'bestseller',
+    inStock: true,
+    sku: 'SMH-LK-6000',
+    material: 'Solid Machined Brass',
+    finish: 'Polished Brass & Chrome Shackle',
+    dimensions: '60mm Width x 85mm Height',
+    warranty: '5 Years Warranty',
+    description: 'Heavy duty weather-proof padlock constructed from a single block of solid extruded brass. Hardened boron steel shackle resists cutting and sawing.',
+    features: [
+      'Hardened steel shackle resists 5-ton cutting force',
+      'Dual stainless steel ball locking mechanism',
+      '6-pin tumbler precision cylinder with anti-pick pins',
+      'Includes 3 computer-dimpled nickel keys'
+    ],
+    type: 'padlock_brass'
+  },
+  {
+    id: 'smh-011',
+    name: 'Tempered Glass Security Patch Lock System',
+    category: 'Locks & Security',
+    categoryId: 'locks-security',
+    subtitle: '10-12mm Toughened Glass • Stainless Steel Cover',
+    price: 1350,
+    originalPrice: 1650,
+    discountPercentage: 18,
+    rating: 4.9,
+    reviewCount: 17,
+    badge: '18% OFF',
+    badgeType: 'discount',
+    inStock: true,
+    sku: 'SMH-GL-100',
+    material: 'SS 304 Cover Plate & Alloy Mechanism',
+    finish: 'Brushed Satin Stainless Steel',
+    dimensions: '160mm x 52mm x 32mm',
+    warranty: '5 Years Warranty',
+    description: 'Frameless glass door patch lock set designed for 10-12mm toughened glass panels in offices and retail showrooms. Double sided computer key cylinder.',
+    features: [
+      'No notch glass cut-out required option',
+      'Precision stainless steel 304 outer covers',
+      'High security double key brass cylinder',
+      'Includes floor keeper socket plate'
+    ],
+    type: 'glass_lock'
+  },
+
+  // HINGES
+  {
+    id: 'smh-003',
+    name: 'Titan Soft-Close Concealed Hinge (SS 304)',
+    category: 'Hinges',
+    categoryId: 'hinges',
+    subtitle: 'Full Overlay • 3D Hydraulic Cushioning',
+    price: 280,
+    originalPrice: 350,
+    discountPercentage: 20,
+    rating: 4.8,
+    reviewCount: 82,
+    badge: 'BESTSELLER',
+    badgeType: 'bestseller',
+    inStock: true,
+    sku: 'SMH-HG-3040',
+    material: 'Stainless Steel Grade 304',
+    finish: 'Brushed Nickel Satin',
+    dimensions: '110mm x 64mm (110° Opening Angle)',
+    warranty: '5 Years Replacement Warranty',
+    description: 'Industrial grade hydraulic cabinet hinge with integrated copper cylinder damper for whisper-quiet soft close action. 3D adjustment screws for precise door alignment.',
+    features: [
+      'Integrated silent hydraulic damper cylinder',
+      'SS 304 grade anti-rust lifetime durability',
+      'Quick release clip-on mounting plate',
+      '110-degree wide opening angle'
+    ],
+    type: 'hinge_hydraulic'
+  },
+  {
+    id: 'smh-016',
+    name: 'Heavy Duty SS 304 Ball Bearing Door Hinge (4x3x3mm)',
+    category: 'Hinges',
+    categoryId: 'hinges',
+    subtitle: 'Solid Stainless Steel • 4 Ball Bearings',
+    price: 360,
+    originalPrice: 450,
+    discountPercentage: 20,
+    rating: 4.9,
+    reviewCount: 68,
+    badge: 'HEAVY DUTY',
+    badgeType: 'bestseller',
+    inStock: true,
+    sku: 'SMH-HG-4030',
+    material: 'Stainless Steel Grade 304',
+    finish: 'Matt Satin SS',
+    dimensions: '102mm x 76mm x 3mm',
+    warranty: '10 Years Warranty',
+    description: 'Heavy duty butt hinge equipped with four lubricated steel ball bearing rings. Designed for heavy solid wood main entrance doors up to 90kg.',
+    features: [
+      'Smooth silent rotation with zero friction wear',
+      'Non-removable pinned security rod'
+    ],
+    type: 'hinge_hydraulic'
+  },
+
+  // CABINET HARDWARE
+  {
+    id: 'smh-004',
+    name: 'Precision Heavy-Duty Full Extension Drawer Slides',
+    category: 'Cabinet Hardware',
+    categoryId: 'cabinet-hardware',
+    subtitle: '22 Inch • 45KG Load Capacity • Soft Close',
+    price: 540,
+    originalPrice: 600,
+    discountPercentage: 10,
+    rating: 4.7,
+    reviewCount: 65,
+    badge: '10% OFF',
+    badgeType: 'discount',
+    inStock: true,
+    sku: 'SMH-CH-4522',
+    material: 'Cold-Rolled Steel',
+    finish: 'Zinc Galvanized Plated',
+    dimensions: '550mm (22 Inches) Length',
+    warranty: '5 Years Functional Warranty',
+    description: 'Triple-stage telescoping ball-bearing channel system supporting up to 45kg load. Integrated hydraulic soft-closing mechanism eliminates drawer slam.',
+    features: [
+      'High precision steel ball bearings for ultra-smooth glide',
+      'Spring-assisted hydraulic soft-close damper',
+      'Full extension access to rear drawer space',
+      'Quick disconnect lever for easy drawer removal'
+    ],
+    type: 'drawer_slide'
+  },
+  {
+    id: 'smh-009',
+    name: 'Matrix Satin Black Architectural Cabinet Knob',
+    category: 'Cabinet Hardware',
+    categoryId: 'cabinet-hardware',
+    subtitle: 'Mushroom Dome Design • Solid Zinc Alloy',
+    price: 95,
+    originalPrice: 120,
+    discountPercentage: 21,
+    rating: 4.8,
+    reviewCount: 119,
+    badge: 'POPULAR',
+    badgeType: 'hot',
+    inStock: true,
+    sku: 'SMH-CK-095',
+    material: 'High Density Zinc Alloy',
+    finish: 'Satin Electroplated Black',
+    dimensions: '32mm Head Diameter x 26mm Height',
+    warranty: '5 Years Warranty',
+    description: 'Contemporary geometric cabinet knob featuring smooth chamfered edges and matte satin black finish. Ideal for modern kitchen drawers, wardrobes, and dressers.',
+    features: [
+      'Solid core construction with deep M4 threads',
+      'Electroplated coat resists sweat and oils',
+      'Includes 25mm and 40mm breakaway screws',
+      'Ergonomic grip profile'
+    ],
+    type: 'cabinet_knob'
+  },
+
+  // BATHROOM FITTINGS
+  {
+    id: 'smh-017',
+    name: 'AquaFlow Brass Single Lever Basin Faucet',
+    category: 'Bathroom Fittings',
+    categoryId: 'bathroom-fittings',
+    subtitle: 'Ceramic Disc Cartridge • Honeycomb Aerator',
+    price: 2450,
+    originalPrice: 3100,
+    discountPercentage: 21,
+    rating: 4.9,
+    reviewCount: 26,
+    badge: 'BESTSELLER',
+    badgeType: 'bestseller',
+    inStock: true,
+    sku: 'SMH-BF-100',
+    material: 'Forged Solid Brass',
+    finish: 'Triple Chrome Plated',
+    dimensions: '165mm Height x 120mm Spout Reach',
+    warranty: '10 Years Drip-Free Warranty',
+    description: 'Premium brass wash basin mixer tap featuring smooth ceramic cartridge control and water-saving aerated foam flow.',
+    features: [
+      'High-grade ceramic disc valve tested to 500,000 uses',
+      'Neoperl Swiss honeycomb splash-free aerator'
+    ],
+    type: 'handle_lever'
+  },
+  {
+    id: 'smh-018',
+    name: 'SS 304 Multi-Tier Wall Mounted Towel Rack',
+    category: 'Bathroom Fittings',
+    categoryId: 'bathroom-fittings',
+    subtitle: '24 Inch Length • Folding Shelf + Lower Hooks',
+    price: 1150,
+    originalPrice: 1500,
+    discountPercentage: 23,
+    rating: 4.8,
+    reviewCount: 52,
+    badge: '23% OFF',
+    badgeType: 'discount',
+    inStock: true,
+    sku: 'SMH-BF-200',
+    material: 'Stainless Steel Grade 304',
+    finish: 'Mirror Polished Chrome',
+    dimensions: '600mm x 240mm x 150mm',
+    warranty: '5 Years Warranty',
+    description: 'Foldable bathroom towel organizer constructed from heavy-gauge solid SS 304 tubes. Resists steam and water corrosion.',
+    features: [
+      'Space-saving 90-degree folding top shelf',
+      'Includes 4 movable lower utility hooks'
+    ],
+    type: 'tower_bolt'
+  },
+
+  // TOOLS & ACCESSORIES
+  {
+    id: 'smh-019',
+    name: 'ProGrip Multi-Angle Hardened Hardware Drill Bit Kit',
+    category: 'Tools & Accessories',
+    categoryId: 'tools-accessories',
+    subtitle: 'HSS Cobalt Coated • Wood & Metal Drilling',
+    price: 850,
+    originalPrice: 1100,
+    discountPercentage: 22,
+    rating: 4.8,
+    reviewCount: 39,
+    badge: 'ESSENTIAL',
+    badgeType: 'hot',
+    inStock: true,
+    sku: 'SMH-TL-100',
+    material: 'HSS Grade M2 Cobalt Steel',
+    finish: 'Titanium Nitride Gold Coating',
+    dimensions: '19 Piece Storage Case',
+    warranty: '1 Year Warranty',
+    description: 'Professional grade HSS drill bit set engineered for fast precision drilling into timber, brass, aluminum, and stainless steel door frames.',
+    features: [
+      '135-degree split point prevents drill walking',
+      'Heavy-duty index storage box included'
+    ],
+    type: 'padlock_brass'
+  },
+  {
+    id: 'smh-020',
+    name: 'Heavy Duty Silicone & Caulking Sealant Gun',
+    category: 'Tools & Accessories',
+    categoryId: 'tools-accessories',
+    subtitle: '18:1 High Thrust Ratio • Drip-Free Release',
+    price: 490,
+    originalPrice: 650,
+    discountPercentage: 24,
+    rating: 4.7,
+    reviewCount: 45,
+    badge: '24% OFF',
+    badgeType: 'discount',
+    inStock: true,
+    sku: 'SMH-TL-200',
+    material: 'Reinforced Steel Frame',
+    finish: 'Powder Coated Orange',
+    dimensions: '300ml Standard Cartridge Size',
+    warranty: '2 Years Warranty',
+    description: 'Heavy duty caulking gun with 18:1 mechanical advantage ratio for smooth application of thick door frame sealants and glass adhesives.',
+    features: [
+      'Automatic instant pressure release eliminates mess',
+      '360-degree rotating cartridge barrel'
+    ],
+    type: 'door_closer'
+  }
+];
+
+export const CATEGORIES = [
+  {
+    id: 'door-hardware',
+    name: 'Door Hardware',
+    count: '1,200+ Products',
+    icon: 'door-open',
+    description: 'Handles, pull bars, tower bolts, hinges & closers',
+    type: 'door_hardware',
+    tagline: 'Precision engineered hardware crafted for security, strength and architectural beauty.'
+  },
+  {
+    id: 'handles',
+    name: 'Handles',
+    count: '850+ Products',
+    icon: 'hand-grab',
+    description: 'Architectural mortise, lever, pulled & push handles',
+    type: 'handles',
+    tagline: 'Timeless door & furniture handles designed with ergonomic comfort and metallic luster.'
+  },
+  {
+    id: 'locks-security',
+    name: 'Locks & Security',
+    count: '950+ Products',
+    icon: 'lock',
+    description: 'Biometric smart locks, deadbolts, padlocks & rims',
+    type: 'locks',
+    tagline: 'Advanced biometric access control and hardened mechanical security systems.'
+  },
+  {
+    id: 'hinges',
+    name: 'Hinges',
+    count: '650+ Products',
+    icon: 'sliders',
+    description: 'Hydraulic soft close, butt, pivot & continuous hinges',
+    type: 'hinges',
+    tagline: 'Whisper-quiet hydraulic dampers and heavy duty stainless steel hinge assemblies.'
+  },
+  {
+    id: 'cabinet-hardware',
+    name: 'Cabinet Hardware',
+    count: '1,000+ Products',
+    icon: 'box',
+    description: 'Drawer slides, knobs, profile pulls & gas struts',
+    type: 'cabinet',
+    tagline: 'High load telescoping drawer slides, brass cabinet knobs, and sleek profile channels.'
+  },
+  {
+    id: 'bathroom-fittings',
+    name: 'Bathroom Fittings',
+    count: '750+ Products',
+    icon: 'droplet',
+    description: 'Faucets, towel rails, glass fittings & drainers',
+    type: 'bathroom',
+    tagline: 'Durable brass faucets, frameless glass shower patches, and stainless steel organizers.'
+  },
+  {
+    id: 'tools-accessories',
+    name: 'Tools & Accessories',
+    count: '400+ Products',
+    icon: 'wrench',
+    description: 'Drill bit kits, caulking guns, screws & installation tools',
+    type: 'tools',
+    tagline: 'Professional grade installation tools, fasteners, drill kits and hardware accessories.'
+  },
+  {
+    id: 'offers',
+    name: 'Special Offers',
+    count: 'Exclusive Deals',
+    icon: 'sparkles',
+    description: 'Discounted trade bundles & clearance pricing',
+    type: 'offers',
+    tagline: 'Handpicked seasonal promotions, trade discount packages, and project bundles.'
+  }
+];
+
+export const SHOP_BY_NEEDS = [
+  {
+    id: 'need-1',
+    title: 'Building a New Door',
+    subtitle: 'Locks, handles & hinges',
+    description: 'Complete entry door hardware sets engineered for strength, safety, and modern architectural aesthetics.',
+    icon: 'door-closed',
+    type: 'door'
+  },
+  {
+    id: 'need-2',
+    title: 'Home Renovation',
+    subtitle: 'Upgrade your spaces',
+    description: 'Transform interior doors, kitchen cabinets, and wardrobes with premium metallic accents and smooth fittings.',
+    icon: 'home',
+    type: 'renovation'
+  },
+  {
+    id: 'need-3',
+    title: 'Setting Up Cabinets',
+    subtitle: 'Fittings & accessories',
+    description: 'Heavy duty drawer slides, soft-close hinges, and stylish cabinet knobs designed for effortless everyday use.',
+    icon: 'archive',
+    type: 'cabinet'
+  },
+  {
+    id: 'need-4',
+    title: 'Improving Security',
+    subtitle: 'Smart locks & security',
+    description: 'Upgrade to keyless biometric entry, hardened steel deadbolts, and heavy duty rim security systems.',
+    icon: 'shield-check',
+    type: 'security'
+  },
+  {
+    id: 'need-5',
+    title: 'Commercial Project',
+    subtitle: 'Bulk & professional hardware',
+    description: 'Fire-rated panic hardware, heavy traffic door closers, and high volume project solutions with trade pricing.',
+    icon: 'building-2',
+    type: 'commercial'
+  }
+];
