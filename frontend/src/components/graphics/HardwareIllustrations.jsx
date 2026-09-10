@@ -1,10 +1,74 @@
 import React from 'react';
 
-export function HardwareSVG({ type, width = 300, height = 300 }) {
+export function HardwareSVG({ type, width = 300, height = 300, className = '' }) {
   switch (type) {
+    case 'door-hardware':
+    case 'door_hardware':
+    case 'matte_black_handle':
+      return (
+        <svg width={width} height={height} viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+          <defs>
+            <linearGradient id="mbPlateGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#2D3036"/>
+              <stop offset="40%" stopColor="#1B1C20"/>
+              <stop offset="70%" stopColor="#25272D"/>
+              <stop offset="100%" stopColor="#0F1013"/>
+            </linearGradient>
+            <linearGradient id="mbLeverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3A3D45"/>
+              <stop offset="35%" stopColor="#222429"/>
+              <stop offset="70%" stopColor="#2E3037"/>
+              <stop offset="100%" stopColor="#131417"/>
+            </linearGradient>
+            <linearGradient id="mbGoldRing" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#F47B20"/>
+              <stop offset="50%" stopColor="#E5B25D"/>
+              <stop offset="100%" stopColor="#D4AF37"/>
+            </linearGradient>
+            <filter id="mbShadow" x="-15%" y="-15%" width="135%" height="135%">
+              <feDropShadow dx="4" dy="16" stdDeviation="12" floodColor="#000000" floodOpacity="0.6"/>
+            </filter>
+          </defs>
+
+          {/* Luxury Matte Black Backplate */}
+          <rect x="116" y="32" width="68" height="236" rx="12" fill="url(#mbPlateGrad)" stroke="#383B42" strokeWidth="1.5" filter="url(#mbShadow)"/>
+          <rect x="120" y="36" width="60" height="228" rx="8" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1"/>
+
+          {/* Top & Bottom Countersunk Titanium Screws */}
+          <circle cx="150" cy="48" r="4" fill="#121316" stroke="#33363D" strokeWidth="1"/>
+          <line x1="148" y1="48" x2="152" y2="48" stroke="#64748B" strokeWidth="1.2"/>
+          <circle cx="150" cy="252" r="4" fill="#121316" stroke="#33363D" strokeWidth="1"/>
+          <line x1="148" y1="252" x2="152" y2="252" stroke="#64748B" strokeWidth="1.2"/>
+
+          {/* High-Precision Japanese Magnetic Latch Indicator */}
+          <circle cx="150" cy="158" r="4" fill="#121316" stroke="#2B2D33"/>
+          <circle cx="150" cy="158" r="2" fill="#F47B20"/>
+          <rect x="136" y="168" width="28" height="2" rx="1" fill="rgba(255,255,255,0.06)"/>
+
+          {/* Euro Profile Cylinder Lock Slot */}
+          <circle cx="150" cy="214" r="8" fill="#0C0D0F" stroke="#2A2C32" strokeWidth="1.5"/>
+          <polygon points="146,214 154,214 156,230 144,230" fill="#0C0D0F"/>
+          <circle cx="150" cy="214" r="2.5" fill="#D4AF37" opacity="0.8"/>
+
+          {/* Escutcheon Rose Hub with Hairline Gold Accent */}
+          <circle cx="150" cy="98" r="24" fill="url(#mbPlateGrad)" stroke="#383B42" strokeWidth="1.5"/>
+          <circle cx="150" cy="98" r="21" fill="none" stroke="url(#mbGoldRing)" strokeWidth="1.5" opacity="0.9"/>
+          <circle cx="150" cy="98" r="15" fill="#141518"/>
+
+          {/* Milled Solid Lever Handle */}
+          <g filter="url(#mbShadow)">
+            <path d="M142 86 C142 86, 248 70, 262 72 C274 74, 278 84, 276 94 C273 104, 262 108, 248 107 L142 107 Z" fill="url(#mbLeverGrad)"/>
+            {/* CNC Bevel Highlight */}
+            <path d="M145 89 L256 75" stroke="rgba(255,255,255,0.4)" strokeWidth="1.8" strokeLinecap="round"/>
+            <path d="M145 104 L250 104" stroke="rgba(0,0,0,0.5)" strokeWidth="1.5"/>
+            <circle cx="266" cy="91" r="5" fill="#1B1C20" stroke="url(#mbGoldRing)" strokeWidth="1" opacity="0.75"/>
+          </g>
+        </svg>
+      );
+
     case 'smart_lock':
       return (
-        <svg width={width} height={height} viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width={width} height={height} viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
           <defs>
             <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#2A2C30"/>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShoppingCart, X, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
-import { HardwareSVG } from '../utils/HardwareCanvas';
+import { HardwareSVG } from './graphics/HardwareIllustrations';
 
 export function CartDrawer() {
   const { cart, isCartOpen, setIsCartOpen, incrementQty, decrementQty, removeFromCart, addToast } = useShop();

@@ -1,19 +1,29 @@
 import React, { useState, useMemo } from 'react';
 import { 
   Home, ChevronRight, SlidersHorizontal, Grid, List, Search, 
-  ShieldCheck, FileText, ArrowRight, Sparkles, Filter 
+  ShieldCheck, FileText, ArrowRight, Sparkles, Filter, X, Check
 } from 'lucide-react';
-import { useShop } from '../context/ShopContext';
-import { ProductCard } from './ProductCard';
-import { HardwareSVG } from '../utils/HardwareCanvas';
-import { SelectDropdown } from './SelectDropdown';
+import { useShop } from '../context/ShopContext.jsx';
+import { ProductCard } from './ProductCard.jsx';
+import { HardwareSVG } from './graphics/HardwareIllustrations.jsx';
+import { SelectDropdown } from './SelectDropdown.jsx';
+import { useDebounce } from '../hooks/useDebounce.js';
 
 const MATERIAL_OPTIONS = [
   { value: 'all', label: 'All Materials' },
   { value: 'brass', label: 'Solid Brass' },
   { value: 'stainless', label: 'Stainless Steel 304' },
   { value: 'zinc', label: 'Zinc Alloy' },
+  { value: 'plywood', label: 'Plywood & Boards' },
   { value: 'glass', label: 'Glass & Alloy' }
+];
+
+const PRICE_OPTIONS = [
+  { value: 'all', label: 'All Price Ranges' },
+  { value: 'under-500', label: 'Under ₹500' },
+  { value: '500-1500', label: '₹500 - ₹1,500' },
+  { value: '1500-3000', label: '₹1,500 - ₹3,000' },
+  { value: 'above-3000', label: 'Above ₹3,000' }
 ];
 
 const SORT_OPTIONS = [
@@ -30,47 +40,84 @@ export function CategoryCatalog() {
   const [sortBy, setSortBy] = useState('featured');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
   const [materialFilter, setMaterialFilter] = useState('all');
+  const [priceFilter, setPriceFilter] = useState('all');
+  const [inStockOnly, setInStockOnly] = useState(false);
   const [localSearch, setLocalSearch] = useState('');
+  
+  const debouncedSearch = useDebounce(localSearch, 250);
 
   // Find active category details
-  const currentCategory = categories.find(c => c.id === activeCategory) || {
+  const currentCategory = (categories || []).find(c => c.id === activeCategory) || {
     id: 'all',
     name: 'All Architectural Catalogs',
-    description: 'Explore our complete catalog of door hardware, biometric locks, soft close hinges and cabinet accessories.',
+    description: 'Explore our complete catalog of door hardware, biometric locks, soft close hinges, plywood, and cabinet accessories.',
     tagline: 'Precision engineered architectural hardware designed for modern homes and commercial spaces.'
   };
 
-  // Filter products by category, material, local search
+  // Multi-facet filtering logic
   const filteredProducts = useMemo(() => {
-    let list = products;
+    let list = products || [];
 
+    // Category filter
     if (activeCategory !== 'all') {
       list = list.filter(p => p.categoryId === activeCategory);
     }
 
+    // Material filter
     if (materialFilter !== 'all') {
-      list = list.filter(p => p.material.toLowerCase().includes(materialFilter.toLowerCase()));
+      list = list.filter(p => (p.material || '').toLowerCase().includes(materialFilter.toLowerCase()));
     }
 
-    if (localSearch.trim() !== '') {
-      const q = localSearch.toLowerCase();
+    // Price range filter
+    if (priceFilter !== 'all') {
+      list = list.filter(p => {
+        const price = Number(p.price || p.selling_price) || 0;
+        if (priceFilter === 'under-500') return price < 500;
+        if (priceFilter === '500-1500') return price >= 500 && price <= 1500;
+        if (priceFilter === '1500-3000') return price > 1500 && price <= 3000;
+        if (priceFilter === 'above-3000') return price > 3000;
+        return true;
+      });
+    }
+
+    // In-Stock filter
+    if (inStockOnly) {
+      list = list.filter(p => p.inStock !== false);
+    }
+
+    // Debounced text search
+    if (debouncedSearch.trim() !== '') {
+      const q = debouncedSearch.toLowerCase();
       list = list.filter(p => 
-        p.name.toLowerCase().includes(q) || 
-        p.subtitle.toLowerCase().includes(q) ||
-        p.material.toLowerCase().includes(q) ||
-        p.sku.toLowerCase().includes(q)
+        (p.name || '').toLowerCase().includes(q) || 
+        (p.subtitle || '').toLowerCase().includes(q) ||
+        (p.material || '').toLowerCase().includes(q) ||
+        (p.sku || '').toLowerCase().includes(q) ||
+        (p.category || '').toLowerCase().includes(q)
       );
     }
 
     // Sort products
     return [...list].sort((a, b) => {
-      if (sortBy === 'price-low') return a.price - b.price;
-      if (sortBy === 'price-high') return b.price - a.price;
-      if (sortBy === 'rating') return b.rating - a.rating;
-      if (sortBy === 'discount') return b.discountPercentage - a.discountPercentage;
+      const priceA = Number(a.price || a.selling_price) || 0;
+      const priceB = Number(b.price || b.selling_price) || 0;
+      if (sortBy === 'price-low') return priceA - priceB;
+      if (sortBy === 'price-high') return priceB - priceA;
+      if (sortBy === 'rating') return (b.rating || 5) - (a.rating || 5);
+      if (sortBy === 'discount') return (b.discountPercentage || 0) - (a.discountPercentage || 0);
       return 0; // featured default
     });
-  }, [products, activeCategory, materialFilter, localSearch, sortBy]);
+  }, [products, activeCategory, materialFilter, priceFilter, inStockOnly, debouncedSearch, sortBy]);
+
+  const hasActiveFilters = materialFilter !== 'all' || priceFilter !== 'all' || inStockOnly || localSearch !== '';
+
+  const resetAllFilters = () => {
+    setMaterialFilter('all');
+    setPriceFilter('all');
+    setInStockOnly(false);
+    setLocalSearch('');
+    setSortBy('featured');
+  };
 
   return (
     <div className="catalog-page-container">
@@ -82,7 +129,7 @@ export function CategoryCatalog() {
             <Home size={14} /> Home
           </button>
           <ChevronRight size={14} className="breadcrumb-separator" />
-          <span className="breadcrumb-link" onClick={() => setActiveCategory('all')}>Catalogs</span>
+          <button className="breadcrumb-link" onClick={() => setActiveCategory('all')}>Catalogs</button>
           <ChevronRight size={14} className="breadcrumb-separator" />
           <span className="breadcrumb-current">{currentCategory.name}</span>
         </div>
@@ -95,7 +142,7 @@ export function CategoryCatalog() {
             <span className="catalog-badge">
               <Sparkles size={14} /> ARCHITECTURAL SHOWROOM COLLECTION
             </span>
-            <h1 className="catalog-title">{currentCategory.name} Catalog</h1>
+            <h1 className="catalog-title">{currentCategory.name}</h1>
             <p className="catalog-tagline">{currentCategory.tagline}</p>
             <p className="catalog-description">{currentCategory.description}</p>
             
@@ -107,7 +154,7 @@ export function CategoryCatalog() {
               >
                 All Products
               </button>
-              {categories.map(c => (
+              {(categories || []).map(c => (
                 <button 
                   key={c.id}
                   className={`category-tab-btn ${activeCategory === c.id ? 'is-active' : ''}`}
@@ -127,12 +174,12 @@ export function CategoryCatalog() {
         </div>
       </section>
 
-      {/* Toolbar & Filter Bar */}
+      {/* Toolbar & Multi-Facet Filter Bar */}
       <section className="section catalog-body-section">
         <div className="container">
           
-          <div className="catalog-toolbar">
-            <div className="toolbar-left">
+          <div className="catalog-toolbar" style={{ flexWrap: 'wrap', gap: '1rem' }}>
+            <div className="toolbar-left" style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
               <span className="results-count-badge">
                 Showing <strong>{filteredProducts.length}</strong> products
               </span>
@@ -147,19 +194,60 @@ export function CategoryCatalog() {
                   ariaLabel="Filter by material"
                 />
               </div>
+
+              {/* Price Filter */}
+              <div className="filter-dropdown-wrapper">
+                <SelectDropdown
+                  value={priceFilter}
+                  options={PRICE_OPTIONS}
+                  onChange={setPriceFilter}
+                  ariaLabel="Filter by price"
+                />
+              </div>
+
+              {/* In Stock Only Toggle */}
+              <button
+                onClick={() => setInStockOnly(!inStockOnly)}
+                style={{
+                  background: inStockOnly ? 'var(--color-primary)' : 'var(--color-bg-secondary)',
+                  color: inStockOnly ? '#fff' : 'var(--color-text-main)',
+                  border: '1px solid var(--color-border)',
+                  padding: '6px 12px',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--fs-xs)',
+                  fontWeight: '600',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  transition: 'all var(--transition-fast)'
+                }}
+              >
+                {inStockOnly && <Check size={12} color="var(--color-accent)" />}
+                In-Stock Only
+              </button>
             </div>
 
             <div className="toolbar-right">
-              {/* In-Catalog Search */}
+              {/* In-Catalog Instant Search */}
               <div className="catalog-search-input-wrapper">
                 <Search size={14} />
                 <input 
                   type="text" 
                   className="catalog-search-input" 
-                  placeholder="Filter catalog..." 
+                  placeholder="Search in catalog..." 
                   value={localSearch}
                   onChange={(e) => setLocalSearch(e.target.value)}
                 />
+                {localSearch && (
+                  <button 
+                    onClick={() => setLocalSearch('')}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}
+                    aria-label="Clear search"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
               </div>
 
               {/* Sort By */}
@@ -191,14 +279,51 @@ export function CategoryCatalog() {
             </div>
           </div>
 
-          {/* Catalog Grid View */}
+          {/* Active Filter Chips */}
+          {hasActiveFilters && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', margin: '0.75rem 0 1.5rem 0' }}>
+              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--color-text-muted)' }}>Active Filters:</span>
+              {materialFilter !== 'all' && (
+                <span style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)', padding: '4px 10px', borderRadius: '16px', fontSize: '12px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  Material: {MATERIAL_OPTIONS.find(m => m.value === materialFilter)?.label}
+                  <X size={12} style={{ cursor: 'pointer' }} onClick={() => setMaterialFilter('all')} />
+                </span>
+              )}
+              {priceFilter !== 'all' && (
+                <span style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)', padding: '4px 10px', borderRadius: '16px', fontSize: '12px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  Price: {PRICE_OPTIONS.find(p => p.value === priceFilter)?.label}
+                  <X size={12} style={{ cursor: 'pointer' }} onClick={() => setPriceFilter('all')} />
+                </span>
+              )}
+              {inStockOnly && (
+                <span style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)', padding: '4px 10px', borderRadius: '16px', fontSize: '12px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  In-Stock Only
+                  <X size={12} style={{ cursor: 'pointer' }} onClick={() => setInStockOnly(false)} />
+                </span>
+              )}
+              {localSearch && (
+                <span style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)', padding: '4px 10px', borderRadius: '16px', fontSize: '12px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  Query: "{localSearch}"
+                  <X size={12} style={{ cursor: 'pointer' }} onClick={() => setLocalSearch('')} />
+                </span>
+              )}
+              <button 
+                onClick={resetAllFilters}
+                style={{ background: 'none', border: 'none', color: 'var(--color-accent)', fontSize: '12px', fontWeight: '600', cursor: 'pointer', textDecoration: 'underline' }}
+              >
+                Clear all
+              </button>
+            </div>
+          )}
+
+          {/* Catalog Grid / List View */}
           {filteredProducts.length === 0 ? (
             <div className="catalog-empty-state">
               <div className="empty-state-icon"><Filter size={32} /></div>
               <h3>No matching hardware found</h3>
-              <p>Try adjusting your search query or material filter.</p>
-              <button className="btn-secondary" onClick={() => { setMaterialFilter('all'); setLocalSearch(''); }}>
-                Reset Filters
+              <p>Try adjusting your search query, material filter, or price parameters.</p>
+              <button className="btn-secondary" onClick={resetAllFilters}>
+                Reset All Filters
               </button>
             </div>
           ) : (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, ArrowRight, Compass } from 'lucide-react';
-import { HardwareSVG } from '../utils/HardwareCanvas';
+import { HardwareSVG } from './graphics/HardwareIllustrations';
 
 export function Hero() {
   const [offset, setOffset] = useState({ x: 0, y: 0 });

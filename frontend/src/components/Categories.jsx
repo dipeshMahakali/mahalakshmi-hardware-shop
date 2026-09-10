@@ -1,20 +1,12 @@
 import React from 'react';
-import { Flame, ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
-import { PRODUCTS } from '../data/products.js';
-import { useProducts } from '../hooks/useProducts.js';
-import { ProductCard } from './ProductCard.jsx';
+import { Layers, ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { CATEGORIES } from '../data/products.js';
+import { HardwareSVG } from './graphics/HardwareIllustrations.jsx';
 import { useShop } from '../context/ShopContext.jsx';
 import { useRotaryCarousel } from '../hooks/useRotaryCarousel.js';
 
-export { RecommendedProducts } from './RecommendedProducts.jsx';
-
-export function BestSellers() {
+export function Categories() {
   const { setActiveCategory } = useShop();
-  const { products } = useProducts();
-
-  // Curate top bestsellers from catalog source
-  const catalogSource = products && products.length >= 8 ? products : PRODUCTS;
-  const bestSellers = catalogSource.slice(0, 8);
 
   const {
     trackRef,
@@ -28,25 +20,38 @@ export function BestSellers() {
     handleKeyDown,
     containerProps
   } = useRotaryCarousel({
-    itemsLength: bestSellers.length,
-    basePixelsPerSecond: 90,
-    stepDistance: 314
+    itemsLength: CATEGORIES.length,
+    basePixelsPerSecond: 80,
+    stepDistance: 230
   });
 
   // Tripled dataset to create an unbreakable, seamless 360° rotating disk loop
-  const displayProducts = [...bestSellers, ...bestSellers, ...bestSellers];
+  const displayCategories = [...CATEGORIES, ...CATEGORIES, ...CATEGORIES];
+
+  const getCategorySvgType = (cat) => {
+    switch (cat.id) {
+      case 'door-hardware': return 'door_hardware';
+      case 'handles': return 'handle_lever_gold';
+      case 'locks-security': return 'smart_lock';
+      case 'hinges': return 'hinge_hydraulic';
+      case 'cabinet-hardware': return 'drawer_slide';
+      case 'bathroom-fittings': return 'padlock_brass';
+      case 'tools-accessories': return 'tower_bolt';
+      default: return cat.type || cat.id;
+    }
+  };
 
   return (
-    <section className="section" id="bestsellers">
+    <section className="section" id="categories">
       <div className="container">
         <div className="section-header">
           <div className="section-title-group">
             <span className="section-badge">
-              <Flame size={14} /> Customer Favorites
+              <Layers size={14} /> 360° Category Showcase
             </span>
-            <h2 className="section-title">Most Loved Hardware Essentials</h2>
+            <h2 className="section-title">Explore Top Categories</h2>
             <p className="section-subtitle">
-              Popular architectural hardware selected by homeowners and design professionals.
+              Precision engineered architectural hardware for every residential and commercial space.
             </p>
           </div>
 
@@ -90,10 +95,10 @@ export function BestSellers() {
             </div>
 
             <button 
-              onClick={() => setActiveCategory('all')} 
+              onClick={() => setActiveCategory('all')}
               className="section-link carousel-view-all-btn"
             >
-              <span>View All Products</span>
+              <span>View All Categories</span>
               <ArrowRight size={16} />
             </button>
           </div>
@@ -113,11 +118,33 @@ export function BestSellers() {
             onKeyDown={handleKeyDown}
             tabIndex={0}
             role="region"
-            aria-label="Infinite rotating bestsellers showcase"
+            aria-label="Infinite rotating categories showcase"
           >
-            {displayProducts.map((product, idx) => (
-              <div key={`${product.id}-rotary-${idx}`} className="carousel-card-wrap">
-                <ProductCard product={product} />
+            {displayCategories.map((cat, idx) => (
+              <div 
+                key={`${cat.id}-rotary-${idx}`} 
+                className="carousel-category-wrap"
+              >
+                <div 
+                  className="category-card"
+                  onClick={() => setActiveCategory(cat.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setActiveCategory(cat.id);
+                    }
+                  }}
+                >
+                  <div className="category-image-wrap">
+                    <HardwareSVG type={getCategorySvgType(cat)} width={100} height={100} className="category-canvas-icon" />
+                  </div>
+                  <div className="category-meta">
+                    <h3 className="category-title">{cat.name}</h3>
+                    <span className="category-count">{cat.count}</span>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -129,15 +156,15 @@ export function BestSellers() {
             <span className={`disk-spinner ${!isPaused && !isHovered ? 'is-spinning' : ''}`} />
             <span>
               {isPaused 
-                ? 'Bestseller rotation paused • Click Play to spin' 
+                ? 'Category rotation paused • Click Play to spin' 
                 : isHovered 
                   ? 'Holding position • Hover away to resume rotation' 
-                  : `Infinite 360° Rotating Bestsellers (${speedMultiplier}x speed) • Drag or hover to inspect`}
+                  : `Infinite 360° Rotating Categories (${speedMultiplier}x speed) • Drag or hover to inspect`}
             </span>
           </div>
 
           <div className="carousel-hint-text">
-            <span>Drag or use arrows to spin ({bestSellers.length} bestselling items)</span>
+            <span>Drag or use arrows to spin ({CATEGORIES.length} categories)</span>
           </div>
         </div>
       </div>

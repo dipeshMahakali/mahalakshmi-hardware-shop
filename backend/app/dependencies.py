@@ -12,10 +12,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 
 def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
-    token = request.cookies.get(get_settings().session_cookie_name)
+    authorization = request.headers.get("Authorization", "")
+    token = authorization.removeprefix("Bearer ").strip() if authorization.startswith("Bearer ") else None
     if not token:
-        authorization = request.headers.get("Authorization", "")
-        token = authorization.removeprefix("Bearer ").strip() or None
+        token = request.cookies.get(get_settings().session_cookie_name)
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
     try:

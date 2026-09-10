@@ -18,40 +18,12 @@ import { MobileNavDrawer } from './components/MobileNavDrawer.jsx';
 import { QuickViewModal, QuoteModal } from './components/QuickViewModal.jsx';
 import { SupportWidget, ToastContainer } from './components/SupportWidget.jsx';
 import { businessApi } from './api/businessApi';
-import { AdminPanelShell, PartnerPanelShell } from './components/PanelShell.jsx';
+import { AdminPanelShell } from './components/layout/AdminPanelShell.jsx';
+import { PartnerPanelShell } from './components/layout/PartnerPanelShell.jsx';
 import './style.css';
 
-function MainContent({ viewMode, adminToken, setAdminToken, setViewMode }) {
+function MainCatalogContent() {
   const { activeCategory } = useShop();
-
-  if (viewMode === 'carpenter') {
-    if (!adminToken) {
-      return <PartnerLogin onLoginSuccess={() => setAdminToken(true)} onCancel={() => { window.location.href = '/'; }} />;
-    }
-    return <CarpenterPortal />;
-  }
-
-  if (viewMode === 'admin') {
-    if (!adminToken) {
-      return (
-        <AdminLogin
-          onLoginSuccess={(token) => {
-            setAdminToken(token);
-          }}
-          onCancel={() => setViewMode('catalog')}
-        />
-      );
-    }
-    return (
-      <AdminDashboard
-        token={adminToken}
-        onLogout={() => {
-          setAdminToken('');
-          setViewMode('catalog');
-        }}
-      />
-    );
-  }
 
   if (activeCategory !== 'all') {
     return <CategoryCatalog />;
@@ -78,7 +50,42 @@ export default function App() {
   const initialView = initialPath.startsWith('/admin') ? 'admin' : initialPath.startsWith('/partner') ? 'carpenter' : 'catalog';
   const [viewMode, setViewMode] = useState(initialView);
   const [adminToken, setAdminToken] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const [showDemoBar, setShowDemoBar] = useState(false);
+  const [adminTab, setAdminTab] = useState(() => {
+    const hash = window.location.hash.replace('#', '');
+    return ['kpis', 'billing', 'customers', 'inventory', 'khata', 'ai'].includes(hash) ? hash : 'kpis';
+  });
+  const [adminBadges, setAdminBadges] = useState({ aiJobs: 0, lowStock: 0 });
+  const [partnerTab, setPartnerTab] = useState(() => {
+    const hash = window.location.hash.replace('#', '');
+    return ['order', 'photo', 'sites', 'khata', 'orders'].includes(hash) ? hash : 'order';
+  });
+  const [partnerLoyalty, setPartnerLoyalty] = useState(null);
+
+  const handleAdminTabChange = (tabId) => {
+    setAdminTab(tabId);
+    window.location.hash = tabId;
+  };
+
+  const handlePartnerTabChange = (tabId) => {
+    setPartnerTab(tabId);
+    window.location.hash = tabId;
+  };
+
+  useEffect(() => {
+    const onHashChange = () => {
+      const rawHash = window.location.hash.replace('#', '');
+      if (['kpis', 'billing', 'customers', 'inventory', 'khata', 'ai'].includes(rawHash)) {
+        setAdminTab(rawHash);
+      }
+      if (['order', 'photo', 'sites', 'khata', 'orders'].includes(rawHash)) {
+        setPartnerTab(rawHash);
+      }
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
 
   useEffect(() => {
     // Check URL hash or search parameter for route & demo mode
@@ -88,75 +95,148 @@ export default function App() {
     if (initialPath.startsWith('/admin') || hash === '#admin' || search.includes('role=admin')) {
       setViewMode('admin');
       businessApi.getMe().then((user) => {
+        setCurrentUser(user);
         if (user.role === 'OWNER' || user.role === 'STAFF') setAdminToken(true);
-      }).catch(() => setAdminToken(false));
+      }).catch(() => {
+        setCurrentUser(null);
+        setAdminToken(false);
+      });
     } else if (initialPath.startsWith('/partner') || hash === '#carpenter' || search.includes('role=carpenter')) {
       setViewMode('carpenter');
+      businessApi.getMe().then((user) => {
+        setCurrentUser(user);
+        if (user.role === 'CARPENTER' || user.role === 'OWNER') setAdminToken(true);
+      }).catch(() => {
+        setCurrentUser(null);
+        setAdminToken(false);
+      });
     }
 
     if (search.includes('demo=true') || hash.includes('demo')) {
       setShowDemoBar(true);
     }
-  }, []);
+  }, [initialPath]);
 
   return (
     <ShopProvider>
-      {/* Development-only route switcher. Production navigation uses /admin and /partner links. */}
-      {showDemoBar && viewMode === 'catalog' && (
-        <div style={{ background: '#0284c7', color: '#fff', padding: '0.5rem 1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', fontSize: '0.85rem', fontWeight: 'bold' }}>
-          <span>🛠️ Ecosystem Development Switcher:</span>
+      {/* Development route switcher for testing */}
+      {showDemoBar && (
+        <div style={{ background: '#141414', borderBottom: '1px solid #F47B20', color: '#fff', padding: '0.5rem 1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', fontSize: '0.85rem', fontWeight: 'bold' }}>
+          <span>🛠️ Ecosystem Switcher:</span>
           <a
             href="/"
             style={{
-              background: viewMode === 'catalog' ? '#fff' : 'rgba(255,255,255,0.2)',
-              color: viewMode === 'catalog' ? '#0284c7' : '#fff',
-              border: 'none',
+              background: viewMode === 'catalog' ? 'var(--color-accent)' : 'rgba(255,255,255,0.1)',
+              color: '#fff',
               padding: '0.25rem 0.75rem',
               borderRadius: '20px',
-              cursor: 'pointer'
+              textDecoration: 'none'
             }}
           >
-            🛒 Public Catalog & Visualizer
+            🛒 Public Showroom
           </a>
           <a
             href="/partner"
             style={{
-              background: viewMode === 'carpenter' ? '#fff' : 'rgba(255,255,255,0.2)',
-              color: viewMode === 'carpenter' ? '#0284c7' : '#fff',
-              border: 'none',
+              background: viewMode === 'carpenter' ? 'var(--color-accent)' : 'rgba(255,255,255,0.1)',
+              color: '#fff',
               padding: '0.25rem 0.75rem',
               borderRadius: '20px',
-              cursor: 'pointer'
+              textDecoration: 'none'
             }}
           >
-            🔨 Carpenter Partner PWA
+            🔨 Carpenter PWA
           </a>
           <a
             href="/admin"
             style={{
-              background: viewMode === 'admin' ? '#fff' : 'rgba(255,255,255,0.2)',
-              color: viewMode === 'admin' ? '#0284c7' : '#fff',
-              border: 'none',
+              background: viewMode === 'admin' ? 'var(--color-accent)' : 'rgba(255,255,255,0.1)',
+              color: '#fff',
               padding: '0.25rem 0.75rem',
               borderRadius: '20px',
-              cursor: 'pointer'
+              textDecoration: 'none'
             }}
           >
-            📊 Shop Owner Admin Panel
+            📊 Owner Admin Panel
           </a>
         </div>
       )}
 
+      {/* Admin Workspace Route */}
       {viewMode === 'admin' ? (
-        <AdminPanelShell onLogout={adminToken ? () => { setAdminToken(false); window.location.href = '/'; } : null}>
-          <MainContent viewMode="admin" adminToken={adminToken} setAdminToken={setAdminToken} setViewMode={() => { window.location.href = '/'; }} />
-        </AdminPanelShell>
+        !adminToken ? (
+          <AdminLogin
+            onLoginSuccess={(user) => {
+              if (user) setCurrentUser(user);
+              setAdminToken(true);
+            }}
+            onCancel={() => { window.location.href = '/'; }}
+          />
+        ) : (
+          <AdminPanelShell
+            activeTab={adminTab}
+            onTabChange={handleAdminTabChange}
+            badgeCounts={adminBadges}
+            user={currentUser}
+            onLogout={() => {
+              businessApi.logout().finally(() => {
+                setAdminToken(false);
+                setCurrentUser(null);
+                window.location.href = '/';
+              });
+            }}
+          >
+            <AdminDashboard
+              token={adminToken}
+              activeTab={adminTab}
+              onTabChange={handleAdminTabChange}
+              onStatsUpdate={setAdminBadges}
+              onLogout={() => {
+                businessApi.logout().finally(() => {
+                  setAdminToken(false);
+                  setCurrentUser(null);
+                  window.location.href = '/';
+                });
+              }}
+            />
+          </AdminPanelShell>
+        )
       ) : viewMode === 'carpenter' ? (
-        <PartnerPanelShell><MainContent viewMode="carpenter" adminToken={adminToken} setAdminToken={setAdminToken} /></PartnerPanelShell>
+        /* Carpenter Partner PWA Route */
+        !adminToken ? (
+          <PartnerLogin
+            onLoginSuccess={(user) => {
+              if (user) setCurrentUser(user);
+              setAdminToken(true);
+            }}
+            onCancel={() => { window.location.href = '/'; }}
+          />
+        ) : (
+          <PartnerPanelShell
+            activeTab={partnerTab}
+            onTabChange={handlePartnerTabChange}
+            user={currentUser}
+            loyalty={partnerLoyalty}
+            onLogout={() => {
+              businessApi.logout().finally(() => {
+                setAdminToken(false);
+                setCurrentUser(null);
+                window.location.href = '/';
+              });
+            }}
+          >
+            <CarpenterPortal
+              activeTab={partnerTab}
+              onTabChange={handlePartnerTabChange}
+              onLoyaltyUpdate={setPartnerLoyalty}
+            />
+          </PartnerPanelShell>
+        )
       ) : (
+        /* Public Showroom & Catalog Route */
         <>
           <Header setViewMode={setViewMode} viewMode={viewMode} />
-          <MainContent viewMode="catalog" setViewMode={setViewMode} />
+          <MainCatalogContent />
           <Footer setViewMode={setViewMode} />
           <MobileNavDrawer />
           <CartDrawer />

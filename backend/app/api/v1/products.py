@@ -29,7 +29,6 @@ def create_product(payload: ProductCreate, _: User = Depends(require_owner_or_st
 def list_products(
     q: str | None = Query(None),
     category: str | None = Query(None),
-    _: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     stmt = select(Product).where(Product.is_active.is_(True))

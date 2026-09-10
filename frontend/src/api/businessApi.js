@@ -81,5 +81,13 @@ export const businessApi = {
   rewards: () => request('/api/v1/loyalty/rewards'),
   redeemReward: (token, customerId, rewardId) =>
     request('/api/v1/loyalty/redeem', { method: 'POST', body: JSON.stringify({ customer_id: customerId, reward_id: rewardId }) }),
-  dashboard: () => request('/api/v1/reports/dashboard')
+  dashboard: () => request('/api/v1/reports/dashboard'),
+
+  // Orders & Estimates for Carpenter Partner
+  orders: (token, customerId = '') =>
+    request(`/api/v1/orders${customerId ? '?customer_id=' + customerId : ''}`),
+  createOrder: (token, payload) =>
+    request('/api/v1/orders', { method: 'POST', body: JSON.stringify(payload) }),
+  estimates: (token, customerId = '') =>
+    request(`/api/v1/estimates${customerId ? '?customer_id=' + customerId : ''}`)
 };

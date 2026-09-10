@@ -157,6 +157,11 @@ ul, ol {
   transform: translateX(4px);
 }
 
+.highlight-orange {
+  color: var(--color-accent);
+  display: inline-block;
+}
+
 /* Common Animations & Reveals */
 [data-reveal] {
   opacity: 0;

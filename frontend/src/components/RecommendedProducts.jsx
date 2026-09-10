@@ -1,20 +1,21 @@
 import React from 'react';
-import { Flame, ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { Sparkles, ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { PRODUCTS } from '../data/products.js';
 import { useProducts } from '../hooks/useProducts.js';
 import { ProductCard } from './ProductCard.jsx';
 import { useShop } from '../context/ShopContext.jsx';
 import { useRotaryCarousel } from '../hooks/useRotaryCarousel.js';
 
-export { RecommendedProducts } from './RecommendedProducts.jsx';
-
-export function BestSellers() {
+export function RecommendedProducts() {
   const { setActiveCategory } = useShop();
   const { products } = useProducts();
 
-  // Curate top bestsellers from catalog source
-  const catalogSource = products && products.length >= 8 ? products : PRODUCTS;
-  const bestSellers = catalogSource.slice(0, 8);
+  // Curate 8 distinctive recommended items from catalog
+  const catalogSource = products && products.length >= 10 ? products : PRODUCTS;
+  const recommended = catalogSource.slice(6, 14);
+
+  // Tripled dataset to create an unbreakable, seamless 360° rotating disk loop
+  const displayItems = [...recommended, ...recommended, ...recommended];
 
   const {
     trackRef,
@@ -28,25 +29,22 @@ export function BestSellers() {
     handleKeyDown,
     containerProps
   } = useRotaryCarousel({
-    itemsLength: bestSellers.length,
+    itemsLength: recommended.length,
     basePixelsPerSecond: 90,
     stepDistance: 314
   });
 
-  // Tripled dataset to create an unbreakable, seamless 360° rotating disk loop
-  const displayProducts = [...bestSellers, ...bestSellers, ...bestSellers];
-
   return (
-    <section className="section" id="bestsellers">
+    <section className="section recommended-section" id="recommended">
       <div className="container">
         <div className="section-header">
           <div className="section-title-group">
             <span className="section-badge">
-              <Flame size={14} /> Customer Favorites
+              <Sparkles size={14} /> 360° Curated Rotation
             </span>
-            <h2 className="section-title">Most Loved Hardware Essentials</h2>
+            <h2 className="section-title">Recommended Hardware</h2>
             <p className="section-subtitle">
-              Popular architectural hardware selected by homeowners and design professionals.
+              Continuous showcase of high-precision architectural fittings chosen by interior architects and master craftsmen.
             </p>
           </div>
 
@@ -93,7 +91,7 @@ export function BestSellers() {
               onClick={() => setActiveCategory('all')} 
               className="section-link carousel-view-all-btn"
             >
-              <span>View All Products</span>
+              <span>View All</span>
               <ArrowRight size={16} />
             </button>
           </div>
@@ -103,7 +101,7 @@ export function BestSellers() {
           className={`carousel-container-relative ${isMouseDown ? 'is-dragging' : ''}`}
           {...containerProps}
         >
-          {/* Visual Cylindrical Horizon Edge Fade Masks */}
+          {/* Visual 3D Cylinder Edge Fade Masks */}
           <div className="carousel-edge-fade edge-left" />
           <div className="carousel-edge-fade edge-right" />
 
@@ -113,9 +111,9 @@ export function BestSellers() {
             onKeyDown={handleKeyDown}
             tabIndex={0}
             role="region"
-            aria-label="Infinite rotating bestsellers showcase"
+            aria-label="Infinite rotating disk hardware showcase"
           >
-            {displayProducts.map((product, idx) => (
+            {displayItems.map((product, idx) => (
               <div key={`${product.id}-rotary-${idx}`} className="carousel-card-wrap">
                 <ProductCard product={product} />
               </div>
@@ -129,15 +127,15 @@ export function BestSellers() {
             <span className={`disk-spinner ${!isPaused && !isHovered ? 'is-spinning' : ''}`} />
             <span>
               {isPaused 
-                ? 'Bestseller rotation paused • Click Play to spin' 
+                ? 'Disk rotation paused • Click Play to spin' 
                 : isHovered 
                   ? 'Holding position • Hover away to resume rotation' 
-                  : `Infinite 360° Rotating Bestsellers (${speedMultiplier}x speed) • Drag or hover to inspect`}
+                  : `Infinite 360° Rotating Showroom (${speedMultiplier}x speed) • Drag or hover to inspect`}
             </span>
           </div>
 
           <div className="carousel-hint-text">
-            <span>Drag or use arrows to spin ({bestSellers.length} bestselling items)</span>
+            <span>Drag or use arrows to spin ({recommended.length} curated designs)</span>
           </div>
         </div>
       </div>

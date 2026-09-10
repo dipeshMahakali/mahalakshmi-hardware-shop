@@ -1,9 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { PRODUCTS, CATEGORIES } from '../data/products.js';
+import { CATEGORIES as DEFAULT_CATEGORIES } from '../data/products.js';
+import { useProducts } from '../hooks/useProducts.js';
 
 const ShopContext = createContext();
 
 export function ShopProvider({ children }) {
+  const { products, categories, isLive, loading: productsLoading, refetch: refetchProducts } = useProducts();
+
   const [cart, setCart] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('smh_cart') || '[]');
@@ -22,7 +25,7 @@ export function ShopProvider({ children }) {
 
   const [activeCategory, setActiveCategoryState] = useState(() => {
     const hash = window.location.hash.replace('#', '');
-    const valid = CATEGORIES.some(c => c.id === hash);
+    const valid = DEFAULT_CATEGORIES.some(c => c.id === hash);
     return valid ? hash : 'all';
   });
 
@@ -41,13 +44,13 @@ export function ShopProvider({ children }) {
       if (hash === '' || hash === 'hero' || hash === 'home') {
         setActiveCategoryState('all');
       } else {
-        const valid = CATEGORIES.some(c => c.id === hash);
+        const valid = (categories || DEFAULT_CATEGORIES).some(c => c.id === hash);
         if (valid) setActiveCategoryState(hash);
       }
     };
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+  }, [categories]);
 
   const setActiveCategory = (catId) => {
     setActiveCategoryState(catId);
@@ -128,8 +131,11 @@ export function ShopProvider({ children }) {
 
   return (
     <ShopContext.Provider value={{
-      products: PRODUCTS,
-      categories: CATEGORIES,
+      products,
+      categories: categories || DEFAULT_CATEGORIES,
+      isLive,
+      productsLoading,
+      refetchProducts,
       cart,
       wishlist,
       activeCategory,

@@ -1,0 +1,19 @@
+# Python Bytecode Cache (ignores in all subdirectories)
+__pycache__
+*.py[cod]
+*$py.class
+
+# Pytest & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual Environments
+.venv/
+venv/
+env/
+
+# Databases & Environment Secrets
+*.sqlite3
+*.db
+.env

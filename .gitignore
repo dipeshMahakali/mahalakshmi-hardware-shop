@@ -1,0 +1,33 @@
+# Python Bytecode & Cache (matches any __pycache__ directory across all folders)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest & Testing Cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Databases & Environment Secrets
+*.sqlite3
+*.db
+.env
+.env.*
+!.env.example
+
+# Node / Frontend Artifacts
+node_modules/
+dist/
+
+# IDE & Editor Temporary Files
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store

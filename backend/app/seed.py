@@ -16,7 +16,7 @@ def seed_data():
     try:
         # Create Users
         owner = User(name="Mahalakshmi Owner", email="owner@hardware.com", password_hash=hash_password("admin123"), role="OWNER")
-        carpenter_user = User(name="Ramesh Carpenter", email="ramesh@carpenter.com", password_hash=hash_password("carpenter123"), role="CARPENTER")
+        carpenter_user = User(name="Ramesh Carpenter", email="ramesh@carpenter.com", phone="9876543210", password_hash=hash_password("carpenter123"), role="CARPENTER")
         db.add_all([owner, carpenter_user])
         db.flush()
 

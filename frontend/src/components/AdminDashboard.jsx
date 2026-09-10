@@ -1,27 +1,86 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  AlertCircle,
+  AlertTriangle,
+  ArrowUpRight,
+  Check,
+  CircleDollarSign,
+  CreditCard,
+  Package,
+  Plus,
+  Receipt,
+  RefreshCw,
+  Search,
+  Sparkles,
+  Trash2,
+  TrendingUp,
+  Users,
+  Wallet,
+  X
+} from 'lucide-react';
 import { businessApi } from '../api/businessApi';
+import { formatINR } from '../utils/currency';
 
-export function AdminDashboard({ token: propToken, onLogout }) {
+export function AdminDashboard({
+  token: propToken,
+  activeTab: propActiveTab,
+  onTabChange,
+  onStatsUpdate
+}) {
   const [token] = useState(propToken || true);
-  const [activeSubTab, setActiveSubTab] = useState('kpis');
+  const [localActiveTab, setLocalActiveTab] = useState('kpis');
+  const currentTab = propActiveTab || localActiveTab;
+
+  const handleTabSwitch = (tabId) => {
+    setLocalActiveTab(tabId);
+    if (onTabChange) onTabChange(tabId);
+  };
+
   const [dashboardData, setDashboardData] = useState(null);
   const [aiJobs, setAiJobs] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [products, setProducts] = useState([]);
   const [inventoryList, setInventoryList] = useState([]);
+  const [invoicesList, setInvoicesList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [msg, setMsg] = useState(null);
 
-  // Billing state
+  // Billing (POS) state
   const [selectedCustomer, setSelectedCustomer] = useState('');
   const [selectedProject, setSelectedProject] = useState('');
   const [customerProjects, setCustomerProjects] = useState([]);
   const [discount, setDiscount] = useState('0');
   const [billItems, setBillItems] = useState([]);
+  const [productSearchQuery, setProductSearchQuery] = useState('');
 
   // Khata view state
   const [khataCustomer, setKhataCustomer] = useState('');
   const [khataDetails, setKhataDetails] = useState(null);
+  const [khataLoading, setKhataLoading] = useState(false);
+
+  // Modals state
+  const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
+  const [newCustomer, setNewCustomer] = useState({
+    name: '',
+    phone: '',
+    customer_type: 'RETAIL',
+    opening_balance: '0'
+  });
+
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [paymentForm, setPaymentForm] = useState({
+    invoice_id: '',
+    amount: '',
+    method: 'CASH',
+    reference: '',
+    notes: ''
+  });
+
+  // Filters
+  const [aiFilter, setAiFilter] = useState('REVIEW_REQUIRED');
+  const [inventorySearchQuery, setInventorySearchQuery] = useState('');
+  const [customerSearchQuery, setCustomerSearchQuery] = useState('');
 
   useEffect(() => {
     if (token) {
@@ -32,50 +91,129 @@ export function AdminDashboard({ token: propToken, onLogout }) {
   const loadDashboardData = async (authToken) => {
     const t = authToken || token;
     if (!t) return;
+    setRefreshing(true);
     try {
-      const stats = await businessApi.dashboard(t);
-      setDashboardData(stats.data);
+      const [statsRes, jobsRes, custsRes, prodsRes, invRes, invsRes] = await Promise.allSettled([
+        businessApi.dashboard(t),
+        businessApi.aiJobs(t),
+        businessApi.customers(t),
+        businessApi.products(t),
+        businessApi.inventory(t),
+        businessApi.invoices(t)
+      ]);
 
-      const jobs = await businessApi.aiJobs(t);
-      setAiJobs(jobs);
+      if (statsRes.status === 'fulfilled' && statsRes.value?.data) {
+        setDashboardData(statsRes.value.data);
+        if (onStatsUpdate) {
+          onStatsUpdate({
+            aiJobs: statsRes.value.data.ai_pending_jobs || 0,
+            lowStock: statsRes.value.data.low_stock_count || 0
+          });
+        }
+      }
 
-      const custs = await businessApi.customers(t);
-      setCustomers(custs);
+      if (jobsRes.status === 'fulfilled' && Array.isArray(jobsRes.value)) {
+        setAiJobs(jobsRes.value);
+      }
 
-      const prods = await businessApi.products(t);
-      setProducts(prods);
+      if (custsRes.status === 'fulfilled' && Array.isArray(custsRes.value)) {
+        setCustomers(custsRes.value);
+      }
 
-      const inv = await businessApi.inventory(t);
-      setInventoryList(inv);
+      if (prodsRes.status === 'fulfilled' && Array.isArray(prodsRes.value)) {
+        setProducts(prodsRes.value);
+      }
+
+      if (invRes.status === 'fulfilled' && Array.isArray(invRes.value)) {
+        setInventoryList(invRes.value);
+      }
+
+      if (invsRes.status === 'fulfilled' && Array.isArray(invsRes.value)) {
+        setInvoicesList(invsRes.value);
+      }
     } catch (err) {
-      console.error('Error loading admin data:', err);
+      console.error('Error loading dashboard data:', err);
+    } finally {
+      setRefreshing(false);
     }
   };
 
-  const handleCustomerChange = async (cust_id) => {
-    setSelectedCustomer(cust_id);
-    if (!cust_id) return;
+  const handleCustomerChange = async (custId) => {
+    setSelectedCustomer(custId);
+    setSelectedProject('');
+    if (!custId) {
+      setCustomerProjects([]);
+      return;
+    }
     try {
-      const projs = await businessApi.projects(token, cust_id);
-      setCustomerProjects(projs);
+      const projs = await businessApi.projects(token, custId);
+      setCustomerProjects(projs || []);
     } catch (err) {
       console.error('Project load error:', err);
+      setCustomerProjects([]);
     }
   };
 
   const addProductToBill = (prod) => {
-    setBillItems(prev => {
-      const existing = prev.find(i => i.product_id === prod.id);
+    setBillItems((prev) => {
+      const existing = prev.find((i) => i.product_id === prod.id);
       if (existing) {
-        return prev.map(i => i.product_id === prod.id ? { ...i, quantity: i.quantity + 1 } : i);
+        return prev.map((i) =>
+          i.product_id === prod.id ? { ...i, quantity: i.quantity + 1 } : i
+        );
       }
-      return [...prev, { product_id: prod.id, name: prod.name, unit_price: Number(prod.selling_price), quantity: 1 }];
+      return [
+        ...prev,
+        {
+          product_id: prod.id,
+          name: prod.name,
+          unit_price: Number(prod.selling_price),
+          unit: prod.unit || 'piece',
+          quantity: 1
+        }
+      ];
     });
   };
 
+  const updateBillItemQty = (productId, delta) => {
+    setBillItems((prev) =>
+      prev
+        .map((item) => {
+          if (item.product_id === productId) {
+            const newQty = item.quantity + delta;
+            return newQty > 0 ? { ...item, quantity: newQty } : null;
+          }
+          return item;
+        })
+        .filter(Boolean)
+    );
+  };
+
+  const removeBillItem = (productId) => {
+    setBillItems((prev) => prev.filter((i) => i.product_id !== productId));
+  };
+
+  // Subtotal, tax, grand total calculation
+  const subtotal = useMemo(() => {
+    return billItems.reduce((acc, item) => acc + item.unit_price * item.quantity, 0);
+  }, [billItems]);
+
+  const discountAmount = useMemo(() => {
+    const val = Number(discount) || 0;
+    return Math.min(val, subtotal);
+  }, [discount, subtotal]);
+
+  const taxableAmount = Math.max(0, subtotal - discountAmount);
+  const tax = taxableAmount * 0.18;
+  const grandTotal = taxableAmount + tax;
+
   const handleCreateBill = async () => {
-    if (!selectedCustomer || billItems.length === 0) {
-      setMsg('❌ Please select a customer and add at least one product.');
+    if (!selectedCustomer) {
+      setMsg({ type: 'error', text: 'Please select a customer to issue the invoice to.' });
+      return;
+    }
+    if (billItems.length === 0) {
+      setMsg({ type: 'error', text: 'Please add at least one item from the catalog.' });
       return;
     }
     setLoading(true);
@@ -84,14 +222,23 @@ export function AdminDashboard({ token: propToken, onLogout }) {
         customer_id: selectedCustomer,
         project_id: selectedProject || null,
         discount: Number(discount) || 0,
-        items: billItems.map(i => ({ product_id: i.product_id, quantity: i.quantity, unit_price: i.unit_price }))
+        items: billItems.map((i) => ({
+          product_id: i.product_id,
+          quantity: i.quantity,
+          unit_price: i.unit_price
+        }))
       };
       const res = await businessApi.createInvoice(token, invPayload);
-      setMsg(`✅ Invoice ${res.invoice_number} created successfully! Total: ₹${res.total}. Khata updated.`);
+      setMsg({
+        type: 'success',
+        text: `Invoice #${res.invoice_number} created successfully for ${formatINR(res.total)}! Khata balance updated.`
+      });
       setBillItems([]);
+      setDiscount('0');
+      setSelectedProject('');
       loadDashboardData(token);
     } catch (err) {
-      setMsg(`❌ ${err.message}`);
+      setMsg({ type: 'error', text: err.message || 'Failed to generate invoice.' });
     } finally {
       setLoading(false);
     }
@@ -100,241 +247,752 @@ export function AdminDashboard({ token: propToken, onLogout }) {
   const handleApproveAIJob = async (jobId, action) => {
     try {
       await businessApi.approveAIJob(token, jobId, action);
-      setMsg(`✅ AI Draft Order ${action === 'APPROVE' ? 'Approved & Confirmed' : 'Rejected'}.`);
+      setMsg({
+        type: 'success',
+        text: `AI Draft Order ${action === 'APPROVE' ? 'Approved & Confirmed' : 'Rejected'}.`
+      });
       loadDashboardData(token);
     } catch (err) {
-      setMsg(`❌ ${err.message}`);
+      setMsg({ type: 'error', text: err.message || 'Failed to update AI order.' });
     }
   };
 
-  const loadKhataView = async (cust_id) => {
-    setKhataCustomer(cust_id);
-    if (!cust_id) return;
+  const loadKhataView = async (custId) => {
+    setKhataCustomer(custId);
+    if (!custId) {
+      setKhataDetails(null);
+      return;
+    }
+    setKhataLoading(true);
     try {
-      const res = await businessApi.khata(token, cust_id);
+      const res = await businessApi.khata(token, custId);
       setKhataDetails(res);
     } catch (err) {
       console.error('Khata view error:', err);
+      setKhataDetails(null);
+    } finally {
+      setKhataLoading(false);
     }
   };
 
-  // Subtotal calculation
-  const subtotal = billItems.reduce((acc, item) => acc + (item.unit_price * item.quantity), 0);
-  const tax = (subtotal - Number(discount || 0)) * 0.18;
-  const total = subtotal - Number(discount || 0) + tax;
+  const handleCreateCustomer = async (e) => {
+    e.preventDefault();
+    if (!newCustomer.name.trim() || !newCustomer.phone.trim()) {
+      setMsg({ type: 'error', text: 'Please provide customer name and phone number.' });
+      return;
+    }
+    try {
+      const created = await businessApi.createCustomer(token, {
+        name: newCustomer.name.trim(),
+        phone: newCustomer.phone.trim(),
+        customer_type: newCustomer.customer_type,
+        opening_balance: Number(newCustomer.opening_balance) || 0
+      });
+      setMsg({
+        type: 'success',
+        text: `Customer "${created.name}" created successfully!`
+      });
+      setIsCustomerModalOpen(false);
+      setNewCustomer({ name: '', phone: '', customer_type: 'RETAIL', opening_balance: '0' });
+      await loadDashboardData(token);
+      setSelectedCustomer(created.id);
+    } catch (err) {
+      setMsg({ type: 'error', text: err.message || 'Failed to create customer.' });
+    }
+  };
+
+  const handleRecordPayment = async (e) => {
+    e.preventDefault();
+    if (!paymentForm.invoice_id) {
+      setMsg({ type: 'error', text: 'Please select an unpaid invoice.' });
+      return;
+    }
+    const amt = Number(paymentForm.amount);
+    if (!amt || amt <= 0) {
+      setMsg({ type: 'error', text: 'Please enter a valid payment amount.' });
+      return;
+    }
+    try {
+      await businessApi.recordPayment(token, {
+        invoice_id: paymentForm.invoice_id,
+        amount: amt,
+        method: paymentForm.method,
+        reference: paymentForm.reference || null,
+        notes: paymentForm.notes || null
+      });
+      setMsg({
+        type: 'success',
+        text: `Payment of ${formatINR(amt)} successfully recorded! Khata ledger updated.`
+      });
+      setIsPaymentModalOpen(false);
+      setPaymentForm({ invoice_id: '', amount: '', method: 'CASH', reference: '', notes: '' });
+      await loadDashboardData(token);
+      if (khataCustomer) {
+        await loadKhataView(khataCustomer);
+      }
+    } catch (err) {
+      setMsg({ type: 'error', text: err.message || 'Failed to record payment.' });
+    }
+  };
+
+  // Filtered catalog products for POS
+  const filteredProducts = useMemo(() => {
+    if (!productSearchQuery.trim()) return products;
+    const q = productSearchQuery.toLowerCase();
+    return products.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        (p.sku && p.sku.toLowerCase().includes(q)) ||
+        (p.category && p.category.toLowerCase().includes(q))
+    );
+  }, [products, productSearchQuery]);
+
+  // Filtered inventory items
+  const filteredInventory = useMemo(() => {
+    if (!inventorySearchQuery.trim()) return inventoryList;
+    const q = inventorySearchQuery.toLowerCase();
+    return inventoryList.filter(
+      (item) =>
+        (item.product_name && item.product_name.toLowerCase().includes(q)) ||
+        (item.product_id && item.product_id.toLowerCase().includes(q))
+    );
+  }, [inventoryList, inventorySearchQuery]);
+
+  // Filtered customers
+  const filteredCustomers = useMemo(() => {
+    if (!customerSearchQuery.trim()) return customers;
+    const q = customerSearchQuery.toLowerCase();
+    return customers.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        (c.phone && c.phone.includes(q)) ||
+        (c.customer_type && c.customer_type.toLowerCase().includes(q))
+    );
+  }, [customers, customerSearchQuery]);
+
+  // Filtered AI jobs
+  const filteredAiJobs = useMemo(() => {
+    if (aiFilter === 'REVIEW_REQUIRED') {
+      return aiJobs.filter((j) => j.status === 'REVIEW_REQUIRED');
+    }
+    return aiJobs;
+  }, [aiJobs, aiFilter]);
+
+  // Unpaid invoices for selected khata customer
+  const customerUnpaidInvoices = useMemo(() => {
+    if (!khataCustomer) return [];
+    return invoicesList.filter(
+      (inv) => inv.customer_id === khataCustomer && Number(inv.outstanding) > 0
+    );
+  }, [khataCustomer, invoicesList]);
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '2rem auto', padding: '0 1rem' }}>
-      {/* Top Banner */}
-      <div style={{ background: '#0f172a', color: '#fff', padding: '1.5rem 2rem', borderRadius: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <div>
-          <h2 style={{ margin: 0, fontSize: '1.6rem', color: '#38bdf8' }}>📊 Shop Owner Command Center</h2>
-          <p style={{ margin: '0.25rem 0 0 0', color: '#94a3b8', fontSize: '0.9rem' }}>Mahalakshmi Hardware & Building Materials Management System</p>
-        </div>
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button onClick={() => loadDashboardData(token)} style={{ background: '#334155', color: '#fff', border: '1px solid #475569', padding: '0.6rem 1.2rem', borderRadius: '8px', cursor: 'pointer' }}>
-            🔄 Refresh
-          </button>
-          <button
-            onClick={() => {
-              businessApi.logout().finally(() => {
-                if (onLogout) onLogout();
-              });
-            }}
-            style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
-          >
-            🚪 Logout
-          </button>
-        </div>
-      </div>
-
-      {/* Navigation Sub-Tabs */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '2px solid #e2e8f0', paddingBottom: '0.5rem' }}>
-        {[
-          { id: 'kpis', label: '⚡ Dashboard & KPIs' },
-          { id: 'ai', label: `🤖 Pending AI Orders (${dashboardData?.ai_pending_jobs || 0})` },
-          { id: 'billing', label: '🧾 Quick Billing' },
-          { id: 'khata', label: '💰 Digital Khata Ledger' },
-          { id: 'inventory', label: `📦 Inventory & Reorder (${dashboardData?.low_stock_count || 0})` }
-        ].map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveSubTab(tab.id)}
-            style={{
-              padding: '0.75rem 1.25rem',
-              border: 'none',
-              background: activeSubTab === tab.id ? '#2563eb' : '#f1f5f9',
-              color: activeSubTab === tab.id ? '#fff' : '#475569',
-              fontWeight: 'bold',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '0.9rem'
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Feedback Message */}
+    <div className="admin-container">
+      {/* Feedback Banner */}
       {msg && (
-        <div style={{ padding: '1rem', borderRadius: '8px', background: msg.includes('❌') ? '#fef2f2' : '#f0fdf4', color: msg.includes('❌') ? '#991b1b' : '#166534', border: '1px solid #cbd5e1', marginBottom: '1.5rem' }}>
-          {msg}
+        <div className={`admin-feedback ${msg.type === 'error' ? 'error' : 'success'}`}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {msg.type === 'error' ? <AlertCircle size={18} /> : <Check size={18} />}
+            <span>{msg.text}</span>
+          </div>
+          <button
+            type="button"
+            className="admin-feedback-close"
+            onClick={() => setMsg(null)}
+            title="Dismiss message"
+          >
+            &times;
+          </button>
         </div>
       )}
 
-      {/* SUBTAB 1: KPIS & OVERVIEW */}
-      {activeSubTab === 'kpis' && dashboardData && (
+      {/* =========================================================================
+          TAB 1: EXECUTIVE OVERVIEW & OPERATIONS (kpis)
+          ========================================================================= */}
+      {currentTab === 'kpis' && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.25rem', marginBottom: '2rem' }}>
-            <div style={{ background: '#fff', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', borderLeft: '4px solid #2563eb' }}>
-              <span style={{ fontSize: '0.85rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 'bold' }}>Total Sales</span>
-              <h3 style={{ fontSize: '1.8rem', color: '#0f172a', margin: '0.25rem 0' }}>₹{dashboardData.today_sales}</h3>
+          {/* KPI Metrics Grid */}
+          <div className="admin-kpi-grid">
+            <div className="admin-kpi-card kpi-revenue">
+              <div className="admin-kpi-top">
+                <span className="admin-kpi-label">Total Revenue Invoiced</span>
+                <div className="admin-kpi-icon">
+                  <TrendingUp size={20} />
+                </div>
+              </div>
+              <div className="admin-kpi-val">
+                {formatINR(dashboardData?.today_sales || 0)}
+              </div>
+              <div className="admin-kpi-sub">
+                <ArrowUpRight size={13} style={{ color: '#10B981' }} />
+                <span>Cumulative verified sales</span>
+              </div>
             </div>
-            <div style={{ background: '#fff', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', borderLeft: '4px solid #16a34a' }}>
-              <span style={{ fontSize: '0.85rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 'bold' }}>Payments Collected</span>
-              <h3 style={{ fontSize: '1.8rem', color: '#16a34a', margin: '0.25rem 0' }}>₹{dashboardData.today_payments}</h3>
+
+            <div className="admin-kpi-card kpi-collected">
+              <div className="admin-kpi-top">
+                <span className="admin-kpi-label">Payments Received</span>
+                <div className="admin-kpi-icon">
+                  <CircleDollarSign size={20} />
+                </div>
+              </div>
+              <div className="admin-kpi-val">
+                {formatINR(dashboardData?.today_payments || 0)}
+              </div>
+              <div className="admin-kpi-sub">
+                <span>Bank, Cash, UPI settled</span>
+              </div>
             </div>
-            <div style={{ background: '#fff', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', borderLeft: '4px solid #dc2626' }}>
-              <span style={{ fontSize: '0.85rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 'bold' }}>Outstanding Balance</span>
-              <h3 style={{ fontSize: '1.8rem', color: '#dc2626', margin: '0.25rem 0' }}>₹{dashboardData.total_outstanding}</h3>
+
+            <div className="admin-kpi-card kpi-outstanding">
+              <div className="admin-kpi-top">
+                <span className="admin-kpi-label">Khata Credit Outstanding</span>
+                <div className="admin-kpi-icon">
+                  <AlertCircle size={20} />
+                </div>
+              </div>
+              <div className="admin-kpi-val" style={{ color: '#F87171' }}>
+                {formatINR(dashboardData?.total_outstanding || 0)}
+              </div>
+              <div className="admin-kpi-sub">
+                <span>Active contractor dues</span>
+              </div>
             </div>
-            <div style={{ background: '#fff', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', borderLeft: '4px solid #eab308' }}>
-              <span style={{ fontSize: '0.85rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 'bold' }}>Low Stock Alert</span>
-              <h3 style={{ fontSize: '1.8rem', color: '#ca8a04', margin: '0.25rem 0' }}>{dashboardData.low_stock_count} Items</h3>
+
+            <div className="admin-kpi-card kpi-inventory">
+              <div className="admin-kpi-top">
+                <span className="admin-kpi-label">Low Stock Warnings</span>
+                <div className="admin-kpi-icon">
+                  <AlertTriangle size={20} />
+                </div>
+              </div>
+              <div className="admin-kpi-val" style={{ color: '#FBBF24' }}>
+                {dashboardData?.low_stock_count || 0} SKUs
+              </div>
+              <div className="admin-kpi-sub">
+                <span>Items below reorder point</span>
+              </div>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* SUBTAB 2: PENDING AI ORDERS REVIEW */}
-      {activeSubTab === 'ai' && (
-        <div>
-          <h3 style={{ color: '#0f172a', marginBottom: '1rem' }}>🤖 AI Draft Orders Requiring Owner Approval</h3>
-          {aiJobs.filter(j => j.status === 'REVIEW_REQUIRED').length === 0 ? (
-            <div style={{ padding: '2rem', textAlign: 'center', background: '#fff', borderRadius: '12px', color: '#64748b' }}>
-              No pending AI orders requiring review right now.
-            </div>
-          ) : (
-            aiJobs.filter(j => j.status === 'REVIEW_REQUIRED').map(job => (
-              <div key={job.id} style={{ background: '#fff', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '1rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                  <div>
-                    <span style={{ background: '#eff6ff', color: '#2563eb', padding: '0.25rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', marginRight: '0.5rem' }}>
-                      SOURCE: {job.source_type}
-                    </span>
-                    <strong style={{ fontSize: '1.05rem', color: '#0f172a' }}>Project: {job.detected_project || 'General Site'}</strong>
-                  </div>
-                  <span style={{ background: '#fef3c7', color: '#d97706', padding: '0.35rem 0.75rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>
-                    Confidence: {job.confidence_score}%
-                  </span>
-                </div>
+          {/* Quick Actions Ribbon */}
+          <div className="admin-actions-bar">
+            <div className="admin-actions-group">
+              <button
+                type="button"
+                className="admin-action-btn primary"
+                onClick={() => handleTabSwitch('billing')}
+              >
+                <Plus size={15} />
+                <span>Create New Bill</span>
+              </button>
 
-                <p style={{ background: '#f8fafc', padding: '0.75rem', borderRadius: '6px', fontSize: '0.9rem', color: '#334155', fontStyle: 'italic', margin: '0.5rem 0 1rem 0' }}>
-                  "{job.input_text}"
-                </p>
+              <button
+                type="button"
+                className="admin-action-btn"
+                onClick={() => setIsCustomerModalOpen(true)}
+              >
+                <Users size={15} />
+                <span>Add Customer</span>
+              </button>
 
-                <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-                  <button onClick={() => handleApproveAIJob(job.id, 'REJECT')} style={{ background: '#fef2f2', color: '#991b1b', border: '1px solid #fecaca', padding: '0.6rem 1.25rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-                    ❌ Reject Order
-                  </button>
-                  <button onClick={() => handleApproveAIJob(job.id, 'APPROVE')} style={{ background: '#16a34a', color: '#fff', border: 'none', padding: '0.6rem 1.5rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-                    ✅ Approve & Reserve Stock
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
+              <button
+                type="button"
+                className="admin-action-btn"
+                onClick={() => handleTabSwitch('inventory')}
+              >
+                <Package size={15} />
+                <span>Check Inventory</span>
+              </button>
 
-      {/* SUBTAB 3: QUICK BILLING */}
-      {activeSubTab === 'billing' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-          {/* Customer & Product Selection */}
-          <div style={{ background: '#fff', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-            <h4 style={{ margin: '0 0 1rem 0', color: '#0f172a' }}>1. Select Customer & Project</h4>
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ fontSize: '0.85rem', color: '#64748b' }}>Customer:</label>
-              <select value={selectedCustomer} onChange={(e) => handleCustomerChange(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #cbd5e1', marginTop: '0.25rem' }}>
-                <option value="">-- Select Customer --</option>
-                {customers.map(c => <option key={c.id} value={c.id}>{c.name} ({c.customer_type})</option>)}
-              </select>
+              <button
+                type="button"
+                className="admin-action-btn"
+                onClick={() => handleTabSwitch('khata')}
+              >
+                <Wallet size={15} />
+                <span>Customer Khata</span>
+              </button>
             </div>
 
-            {selectedCustomer && (
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ fontSize: '0.85rem', color: '#64748b' }}>Project (Optional):</label>
-                <select value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #cbd5e1', marginTop: '0.25rem' }}>
-                  <option value="">-- Select Site Project --</option>
-                  {customerProjects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </select>
-              </div>
-            )}
+            <button
+              type="button"
+              className="admin-action-btn"
+              onClick={() => loadDashboardData(token)}
+              disabled={refreshing}
+              title="Refresh live data from server"
+            >
+              <RefreshCw
+                size={14}
+                style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }}
+              />
+              <span>{refreshing ? 'Syncing...' : 'Sync Live Data'}</span>
+            </button>
+          </div>
 
-            <h4 style={{ margin: '1rem 0 0.5rem 0', color: '#0f172a' }}>2. Add Products from Catalog</h4>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', maxHeight: '320px', overflowY: 'auto' }}>
-              {products.map(p => (
+          {/* Operations Split View */}
+          <div className="admin-ops-grid">
+            {/* Left Column: Recent Invoices Ledger */}
+            <div className="admin-card">
+              <div className="admin-card-header">
+                <h3 className="admin-card-title">
+                  <Receipt size={17} style={{ color: '#F47B20' }} />
+                  <span>Recent Sales Invoices</span>
+                </h3>
                 <button
-                  key={p.id}
-                  onClick={() => addProductToBill(p)}
-                  style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '0.75rem', borderRadius: '8px', textAlign: 'left', cursor: 'pointer' }}
+                  type="button"
+                  className="admin-action-btn"
+                  style={{ padding: '4px 10px', fontSize: '11.5px' }}
+                  onClick={() => handleTabSwitch('billing')}
                 >
-                  <strong style={{ fontSize: '0.85rem', display: 'block', color: '#1e293b' }}>{p.name}</strong>
-                  <span style={{ fontSize: '0.8rem', color: '#16a34a' }}>₹{p.selling_price} / {p.unit}</span>
+                  <Plus size={13} />
+                  <span>New Invoice</span>
                 </button>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          {/* Cart & Billing Summary */}
-          <div style={{ background: '#fff', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <div>
-              <h4 style={{ margin: '0 0 1rem 0', color: '#0f172a' }}>3. Bill Summary</h4>
-              {billItems.length === 0 ? (
-                <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>No items added to bill yet.</p>
+              {invoicesList.length === 0 ? (
+                <div className="admin-empty-state">
+                  <Receipt className="admin-empty-icon" />
+                  <p>No invoices created yet. Use Quick Billing to generate your first bill.</p>
+                </div>
               ) : (
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem', marginBottom: '1rem' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid #cbd5e1', textAlign: 'left' }}>
-                      <th style={{ padding: '0.5rem 0' }}>Item</th>
-                      <th>Qty</th>
-                      <th>Price</th>
-                      <th>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {billItems.map(item => (
-                      <tr key={item.product_id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                        <td style={{ padding: '0.5rem 0' }}>{item.name}</td>
-                        <td>{item.quantity}</td>
-                        <td>₹{item.unit_price}</td>
-                        <td>₹{item.quantity * item.unit_price}</td>
+                <div className="admin-table-container">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Invoice #</th>
+                        <th>Customer</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th style={{ textAlign: 'right' }}>Total</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {invoicesList.slice(0, 6).map((inv) => {
+                        const cust = customers.find((c) => c.id === inv.customer_id);
+                        return (
+                          <tr key={inv.id}>
+                            <td style={{ fontWeight: 700, color: '#FFFFFF' }}>
+                              {inv.invoice_number}
+                            </td>
+                            <td>{cust?.name || 'Walk-in Customer'}</td>
+                            <td>
+                              <span
+                                className={`badge-status ${
+                                  inv.status === 'PAID'
+                                    ? 'paid'
+                                    : inv.status === 'PARTIALLY_PAID'
+                                    ? 'partial'
+                                    : 'pending'
+                                }`}
+                              >
+                                {inv.status}
+                              </span>
+                            </td>
+                            <td style={{ color: '#94A3B8' }}>
+                              {inv.created_at ? new Date(inv.created_at).toLocaleDateString('en-IN') : 'Recent'}
+                            </td>
+                            <td style={{ textAlign: 'right', fontWeight: 700, color: '#10B981' }}>
+                              {formatINR(inv.total)}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
 
+            {/* Right Column: Pending Action Items */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {/* AI Draft Orders Card */}
+              <div className="admin-card">
+                <div className="admin-card-header">
+                  <h3 className="admin-card-title">
+                    <Sparkles size={17} style={{ color: '#D4AF37' }} />
+                    <span>AI Carpenter Draft Orders</span>
+                  </h3>
+                  <span
+                    className={`badge-status ${
+                      aiJobs.filter((j) => j.status === 'REVIEW_REQUIRED').length > 0
+                        ? 'review'
+                        : 'active'
+                    }`}
+                  >
+                    {aiJobs.filter((j) => j.status === 'REVIEW_REQUIRED').length} Pending
+                  </span>
+                </div>
+
+                {aiJobs.filter((j) => j.status === 'REVIEW_REQUIRED').length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '24px 12px', color: '#64748B' }}>
+                    <Check size={28} style={{ color: '#10B981', margin: '0 auto 8px', display: 'block' }} />
+                    <p style={{ margin: 0, fontSize: '13px' }}>All AI orders have been reviewed!</p>
+                  </div>
+                ) : (
+                  aiJobs
+                    .filter((j) => j.status === 'REVIEW_REQUIRED')
+                    .slice(0, 3)
+                    .map((job) => (
+                      <div key={job.id} className="admin-ai-card">
+                        <div className="admin-ai-card-top">
+                          <span className="badge-status source">
+                            {job.source_type} ORDER
+                          </span>
+                          <span
+                            style={{
+                              fontSize: '11px',
+                              fontWeight: 700,
+                              color: Number(job.confidence_score) >= 80 ? '#10B981' : '#F59E0B'
+                            }}
+                          >
+                            {Number(job.confidence_score).toFixed(0)}% Match
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#FFFFFF' }}>
+                          Project: {job.detected_project || 'General Hardware'}
+                        </div>
+                        <div className="admin-ai-prompt">
+                          "{job.input_text}"
+                        </div>
+                        <div className="admin-ai-actions">
+                          <button
+                            type="button"
+                            className="admin-action-btn"
+                            style={{ padding: '5px 10px', fontSize: '11.5px', color: '#F87171' }}
+                            onClick={() => handleApproveAIJob(job.id, 'REJECT')}
+                          >
+                            <X size={13} />
+                            <span>Reject</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="admin-action-btn primary"
+                            style={{ padding: '5px 12px', fontSize: '11.5px' }}
+                            onClick={() => handleApproveAIJob(job.id, 'APPROVE')}
+                          >
+                            <Check size={13} />
+                            <span>Approve & Reserve</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                )}
+              </div>
+
+              {/* Critical Low Stock Items Card */}
+              <div className="admin-card">
+                <div className="admin-card-header">
+                  <h3 className="admin-card-title">
+                    <AlertTriangle size={17} style={{ color: '#F59E0B' }} />
+                    <span>Low Stock Reorders</span>
+                  </h3>
+                  <button
+                    type="button"
+                    className="admin-action-btn"
+                    style={{ padding: '4px 10px', fontSize: '11.5px' }}
+                    onClick={() => handleTabSwitch('inventory')}
+                  >
+                    <span>View All</span>
+                  </button>
+                </div>
+
+                {inventoryList.filter((item) => Number(item.available) <= Number(item.reorder_level)).length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '20px 12px', color: '#64748B' }}>
+                    <p style={{ margin: 0, fontSize: '13px' }}>All product inventory levels are healthy.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {inventoryList
+                      .filter((item) => Number(item.available) <= Number(item.reorder_level))
+                      .slice(0, 3)
+                      .map((item) => (
+                        <div
+                          key={item.id}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '10px 12px',
+                            background: '#111317',
+                            borderRadius: '8px',
+                            border: '1px solid rgba(239, 68, 68, 0.2)'
+                          }}
+                        >
+                          <div>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: '#FFFFFF' }}>
+                              {item.product_name}
+                            </div>
+                            <div style={{ fontSize: '11px', color: '#94A3B8' }}>
+                              Reorder at: {item.reorder_level} units
+                            </div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <span className="badge-status lowstock">
+                              {item.available} Left
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          TAB 2: POINT OF SALE (POS) & INVOICING (billing)
+          ========================================================================= */}
+      {currentTab === 'billing' && (
+        <div className="admin-billing-grid">
+          {/* Left: Customer, Project & Catalog Picker */}
+          <div className="admin-card">
+            <div className="admin-card-header">
+              <h3 className="admin-card-title">
+                <Receipt size={17} style={{ color: '#F47B20' }} />
+                <span>1. Select Customer & Add Products</span>
+              </h3>
+              <button
+                type="button"
+                className="admin-action-btn"
+                style={{ padding: '5px 10px', fontSize: '12px' }}
+                onClick={() => setIsCustomerModalOpen(true)}
+              >
+                <Plus size={13} />
+                <span>New Customer</span>
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '16px' }}>
+              <div className="admin-form-group" style={{ margin: 0 }}>
+                <label className="admin-label">Customer / Contractor:</label>
+                <select
+                  className="admin-select"
+                  value={selectedCustomer}
+                  onChange={(e) => handleCustomerChange(e.target.value)}
+                >
+                  <option value="">-- Choose Customer --</option>
+                  {customers.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} ({c.customer_type})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="admin-form-group" style={{ margin: 0 }}>
+                <label className="admin-label">Site Project (Optional):</label>
+                <select
+                  className="admin-select"
+                  value={selectedProject}
+                  onChange={(e) => setSelectedProject(e.target.value)}
+                  disabled={!selectedCustomer}
+                >
+                  <option value="">-- General Walk-in / Site --</option>
+                  {customerProjects.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Catalog Search & Grid */}
+            <div style={{ marginBottom: '14px' }}>
+              <div style={{ position: 'relative' }}>
+                <Search
+                  size={15}
+                  style={{
+                    position: 'absolute',
+                    left: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: '#64748B'
+                  }}
+                />
+                <input
+                  type="text"
+                  className="admin-input"
+                  style={{ paddingLeft: '34px' }}
+                  placeholder="Search catalog products by name, SKU or category..."
+                  value={productSearchQuery}
+                  onChange={(e) => setProductSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="admin-product-picker-grid">
+              {filteredProducts.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className="admin-product-btn"
+                  onClick={() => addProductToBill(p)}
+                  title={`Click to add ${p.name}`}
+                >
+                  <div>
+                    <strong>{p.name}</strong>
+                    <span style={{ fontSize: '11px', color: '#94A3B8' }}>
+                      SKU: {p.sku} &bull; {p.unit || 'pc'}
+                    </span>
+                  </div>
+                  <div className="admin-product-btn-footer">
+                    <span className="admin-product-price">{formatINR(p.selling_price)}</span>
+                    <span
+                      style={{
+                        fontSize: '11px',
+                        background: 'rgba(244, 123, 32, 0.15)',
+                        color: '#F47B20',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        fontWeight: 700
+                      }}
+                    >
+                      + Add
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: Cart & Invoice Summary */}
+          <div className="admin-card" style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="admin-card-header">
+              <h3 className="admin-card-title">
+                <CreditCard size={17} style={{ color: '#10B981' }} />
+                <span>2. Cart & Tax Invoice Summary</span>
+              </h3>
+              {billItems.length > 0 && (
+                <button
+                  type="button"
+                  className="admin-action-btn"
+                  style={{ padding: '4px 8px', fontSize: '11.5px', color: '#F87171' }}
+                  onClick={() => setBillItems([])}
+                >
+                  <Trash2 size={13} />
+                  <span>Clear</span>
+                </button>
+              )}
+            </div>
+
+            <div style={{ flex: 1 }}>
+              {billItems.length === 0 ? (
+                <div className="admin-empty-state" style={{ padding: '60px 20px' }}>
+                  <Receipt className="admin-empty-icon" />
+                  <p>Cart is currently empty. Click on products from the catalog on the left to add items.</p>
+                </div>
+              ) : (
+                <div className="admin-table-container" style={{ maxHeight: '280px' }}>
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th style={{ textAlign: 'right' }}>Total</th>
+                        <th style={{ width: '30px' }}></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {billItems.map((item) => (
+                        <tr key={item.product_id}>
+                          <td>
+                            <div style={{ fontWeight: 600, color: '#FFFFFF' }}>{item.name}</div>
+                            <small style={{ color: '#94A3B8' }}>{formatINR(item.unit_price)} / {item.unit}</small>
+                          </td>
+                          <td>
+                            <div className="admin-qty-control">
+                              <button
+                                type="button"
+                                className="admin-qty-btn"
+                                onClick={() => updateBillItemQty(item.product_id, -1)}
+                              >
+                                -
+                              </button>
+                              <span style={{ minWidth: '20px', textAlign: 'center', fontWeight: 700 }}>
+                                {item.quantity}
+                              </span>
+                              <button
+                                type="button"
+                                className="admin-qty-btn"
+                                onClick={() => updateBillItemQty(item.product_id, 1)}
+                              >
+                                +
+                              </button>
+                            </div>
+                          </td>
+                          <td>{formatINR(item.unit_price)}</td>
+                          <td style={{ textAlign: 'right', fontWeight: 700, color: '#FFFFFF' }}>
+                            {formatINR(item.quantity * item.unit_price)}
+                          </td>
+                          <td>
+                            <button
+                              type="button"
+                              onClick={() => removeBillItem(item.product_id)}
+                              style={{ background: 'none', border: 'none', color: '#F87171', cursor: 'pointer', padding: '4px' }}
+                              title="Remove item"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Bill Summary Footer */}
             {billItems.length > 0 && (
-              <div style={{ borderTop: '2px solid #e2e8f0', paddingTop: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem', fontSize: '0.9rem' }}>
-                  <span>Subtotal:</span> <span>₹{subtotal.toFixed(2)}</span>
+              <div className="admin-bill-summary">
+                <div className="admin-bill-row">
+                  <span>Subtotal:</span>
+                  <span>{formatINR(subtotal, true)}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem', fontSize: '0.9rem' }}>
-                  <span>GST (18%):</span> <span>₹{tax.toFixed(2)}</span>
+
+                <div className="admin-bill-row" style={{ alignItems: 'center' }}>
+                  <span>Discount (₹):</span>
+                  <input
+                    type="number"
+                    min="0"
+                    className="admin-input"
+                    style={{ width: '100px', padding: '4px 8px', textAlign: 'right' }}
+                    value={discount}
+                    onChange={(e) => setDiscount(e.target.value)}
+                  />
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '1.2rem', color: '#0f172a', margin: '0.5rem 0' }}>
-                  <span>Grand Total:</span> <span>₹{total.toFixed(2)}</span>
+
+                <div className="admin-bill-row">
+                  <span>GST (18% Estimated):</span>
+                  <span>{formatINR(tax, true)}</span>
+                </div>
+
+                <div className="admin-bill-total-row">
+                  <span>Grand Total:</span>
+                  <span style={{ color: '#F47B20' }}>{formatINR(grandTotal, true)}</span>
                 </div>
 
                 <button
-                  onClick={handleCreateBill}
+                  type="button"
+                  className="admin-action-btn primary"
+                  style={{
+                    width: '100%',
+                    justifyContent: 'center',
+                    padding: '12px',
+                    fontSize: '14px',
+                    fontWeight: 800,
+                    marginTop: '16px'
+                  }}
                   disabled={loading}
-                  style={{ width: '100%', background: '#2563eb', color: '#fff', padding: '0.85rem', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', marginTop: '0.5rem' }}
+                  onClick={handleCreateBill}
                 >
-                  {loading ? 'Processing Invoice...' : '⚡ Generate Invoice & Update Khata'}
+                  <Receipt size={17} />
+                  <span>{loading ? 'Issuing Tax Invoice...' : 'Generate Tax Invoice & Update Khata'}</span>
                 </button>
               </div>
             )}
@@ -342,87 +1000,652 @@ export function AdminDashboard({ token: propToken, onLogout }) {
         </div>
       )}
 
-      {/* SUBTAB 4: KHATA LEDGER VIEW */}
-      {activeSubTab === 'khata' && (
-        <div style={{ background: '#fff', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-          <h4 style={{ margin: '0 0 1rem 0', color: '#0f172a' }}>Digital Customer Ledger (Khata)</h4>
-          <select value={khataCustomer} onChange={(e) => loadKhataView(e.target.value)} style={{ padding: '0.6rem', borderRadius: '6px', border: '1px solid #cbd5e1', width: '300px', marginBottom: '1.5rem' }}>
-            <option value="">-- Select Customer to View Khata --</option>
-            {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
+      {/* =========================================================================
+          TAB 3: CUSTOMERS & CONTRACTORS DIRECTORY (customers)
+          ========================================================================= */}
+      {currentTab === 'customers' && (
+        <div className="admin-card">
+          <div className="admin-card-header">
+            <h3 className="admin-card-title">
+              <Users size={17} style={{ color: '#F47B20' }} />
+              <span>Customer & Contractor Master Directory</span>
+            </h3>
+            <button
+              type="button"
+              className="admin-action-btn primary"
+              onClick={() => setIsCustomerModalOpen(true)}
+            >
+              <Plus size={15} />
+              <span>Add New Customer</span>
+            </button>
+          </div>
 
-          {khataDetails && (
+          <div style={{ marginBottom: '16px', maxWidth: '360px' }}>
+            <div style={{ position: 'relative' }}>
+              <Search
+                size={15}
+                style={{
+                  position: 'absolute',
+                  left: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#64748B'
+                }}
+              />
+              <input
+                type="text"
+                className="admin-input"
+                style={{ paddingLeft: '34px' }}
+                placeholder="Search customers by name, phone, type..."
+                value={customerSearchQuery}
+                onChange={(e) => setCustomerSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="admin-table-container">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Customer Name</th>
+                  <th>Category</th>
+                  <th>Contact Phone</th>
+                  <th>Opening Balance</th>
+                  <th style={{ textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredCustomers.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} style={{ textAlign: 'center', padding: '32px', color: '#64748B' }}>
+                      No customers found matching your search query.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredCustomers.map((c) => (
+                    <tr key={c.id}>
+                      <td style={{ fontWeight: 700, color: '#FFFFFF' }}>{c.name}</td>
+                      <td>
+                        <span className="badge-status active">{c.customer_type}</span>
+                      </td>
+                      <td style={{ color: '#94A3B8' }}>{c.phone}</td>
+                      <td style={{ fontWeight: 600 }}>{formatINR(c.opening_balance)}</td>
+                      <td style={{ textAlign: 'right' }}>
+                        <button
+                          type="button"
+                          className="admin-action-btn"
+                          style={{ padding: '5px 12px', fontSize: '11.5px' }}
+                          onClick={() => {
+                            handleTabSwitch('khata');
+                            loadKhataView(c.id);
+                          }}
+                        >
+                          <Wallet size={13} />
+                          <span>View Khata</span>
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          TAB 4: DIGITAL KHATA LEDGER (khata)
+          ========================================================================= */}
+      {currentTab === 'khata' && (
+        <div className="admin-card">
+          <div className="admin-card-header">
+            <h3 className="admin-card-title">
+              <Wallet size={17} style={{ color: '#F47B20' }} />
+              <span>Digital Customer Credit Khata Ledger</span>
+            </h3>
+            {khataCustomer && khataDetails && (
+              <button
+                type="button"
+                className="admin-action-btn primary"
+                onClick={() => {
+                  setPaymentForm({
+                    invoice_id: customerUnpaidInvoices[0]?.id || '',
+                    amount: String(customerUnpaidInvoices[0]?.outstanding || khataDetails.outstanding || ''),
+                    method: 'CASH',
+                    reference: '',
+                    notes: ''
+                  });
+                  setIsPaymentModalOpen(true);
+                }}
+              >
+                <Plus size={14} />
+                <span>Record Payment Received</span>
+              </button>
+            )}
+          </div>
+
+          <div style={{ maxWidth: '380px', marginBottom: '20px' }}>
+            <label className="admin-label">Select Customer to View Khata Statement:</label>
+            <select
+              className="admin-select"
+              value={khataCustomer}
+              onChange={(e) => loadKhataView(e.target.value)}
+            >
+              <option value="">-- Choose Customer --</option>
+              {customers.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name} ({c.customer_type})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {khataLoading && (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#94A3B8' }}>
+              <RefreshCw size={24} style={{ animation: 'spin 1s linear infinite', margin: '0 auto 10px', display: 'block' }} />
+              Loading Khata transactions...
+            </div>
+          )}
+
+          {!khataLoading && !khataDetails && (
+            <div className="admin-empty-state">
+              <Wallet className="admin-empty-icon" />
+              <p>Select a customer above to view their running balance, debit/credit ledger, and record settlements.</p>
+            </div>
+          )}
+
+          {!khataLoading && khataDetails && (
             <div>
-              <div style={{ display: 'flex', gap: '2rem', marginBottom: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px' }}>
-                <div><span>Opening Balance:</span> <strong>₹{khataDetails.opening_balance}</strong></div>
-                <div><span>Total Debit:</span> <strong style={{ color: '#2563eb' }}>₹{khataDetails.debit}</strong></div>
-                <div><span>Total Credit:</span> <strong style={{ color: '#16a34a' }}>₹{khataDetails.credit}</strong></div>
-                <div><span>Net Outstanding:</span> <strong style={{ color: '#dc2626' }}>₹{khataDetails.outstanding}</strong></div>
+              {/* Summary Metric Cards */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(4, 1fr)',
+                  gap: '14px',
+                  marginBottom: '20px'
+                }}
+              >
+                <div style={{ background: '#111317', padding: '14px 18px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <span style={{ fontSize: '11.5px', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700 }}>
+                    Opening Balance
+                  </span>
+                  <div style={{ fontSize: '20px', fontWeight: 800, color: '#FFFFFF', marginTop: '4px' }}>
+                    {formatINR(khataDetails.opening_balance)}
+                  </div>
+                </div>
+
+                <div style={{ background: '#111317', padding: '14px 18px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <span style={{ fontSize: '11.5px', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700 }}>
+                    Total Sales Debit (+)
+                  </span>
+                  <div style={{ fontSize: '20px', fontWeight: 800, color: '#38BDF8', marginTop: '4px' }}>
+                    {formatINR(khataDetails.debit)}
+                  </div>
+                </div>
+
+                <div style={{ background: '#111317', padding: '14px 18px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <span style={{ fontSize: '11.5px', color: '#94A3B8', textTransform: 'uppercase', fontWeight: 700 }}>
+                    Total Settled Credit (-)
+                  </span>
+                  <div style={{ fontSize: '20px', fontWeight: 800, color: '#10B981', marginTop: '4px' }}>
+                    {formatINR(khataDetails.credit)}
+                  </div>
+                </div>
+
+                <div style={{ background: '#111317', padding: '14px 18px', borderRadius: '10px', border: '1px solid rgba(239, 68, 68, 0.25)' }}>
+                  <span style={{ fontSize: '11.5px', color: '#F87171', textTransform: 'uppercase', fontWeight: 700 }}>
+                    Net Outstanding Dues
+                  </span>
+                  <div style={{ fontSize: '20px', fontWeight: 800, color: '#EF4444', marginTop: '4px' }}>
+                    {formatINR(khataDetails.outstanding)}
+                  </div>
+                </div>
               </div>
 
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-                <thead>
-                  <tr style={{ background: '#f1f5f9', textAlign: 'left' }}>
-                    <th style={{ padding: '0.75rem' }}>Type</th>
-                    <th style={{ padding: '0.75rem' }}>Description</th>
-                    <th style={{ padding: '0.75rem' }}>Debit (+)</th>
-                    <th style={{ padding: '0.75rem' }}>Credit (-)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {khataDetails.transactions.map((t, idx) => (
-                    <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                      <td style={{ padding: '0.75rem', fontWeight: 'bold', color: t.type === 'CREDIT_SALE' ? '#2563eb' : '#16a34a' }}>{t.type}</td>
-                      <td style={{ padding: '0.75rem' }}>{t.description}</td>
-                      <td style={{ padding: '0.75rem' }}>{Number(t.debit) > 0 ? `₹${t.debit}` : '-'}</td>
-                      <td style={{ padding: '0.75rem' }}>{Number(t.credit) > 0 ? `₹${t.credit}` : '-'}</td>
+              {/* Transactions Table */}
+              <div className="admin-table-container">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Transaction Description</th>
+                      <th>Debit (+)</th>
+                      <th>Credit (-)</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {khataDetails.transactions.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} style={{ textAlign: 'center', padding: '24px', color: '#64748B' }}>
+                          No transactions recorded for this customer yet.
+                        </td>
+                      </tr>
+                    ) : (
+                      khataDetails.transactions.map((t, idx) => (
+                        <tr key={idx}>
+                          <td>
+                            <span
+                              className={`badge-status ${
+                                t.type === 'CREDIT_SALE' || t.type === 'DEBIT' ? 'partial' : 'paid'
+                              }`}
+                            >
+                              {t.type}
+                            </span>
+                          </td>
+                          <td style={{ color: '#FFFFFF' }}>{t.description}</td>
+                          <td style={{ color: Number(t.debit) > 0 ? '#38BDF8' : '#64748B', fontWeight: 600 }}>
+                            {Number(t.debit) > 0 ? formatINR(t.debit) : '-'}
+                          </td>
+                          <td style={{ color: Number(t.credit) > 0 ? '#10B981' : '#64748B', fontWeight: 600 }}>
+                            {Number(t.credit) > 0 ? formatINR(t.credit) : '-'}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>
       )}
 
-      {/* SUBTAB 5: INVENTORY & REORDER */}
-      {activeSubTab === 'inventory' && (
-        <div style={{ background: '#fff', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-          <h4 style={{ margin: '0 0 1rem 0', color: '#0f172a' }}>Live Inventory Levels & Reorder Triggers</h4>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
-            <thead>
-              <tr style={{ background: '#f1f5f9', textAlign: 'left' }}>
-                <th style={{ padding: '0.75rem' }}>Product Name</th>
-                <th style={{ padding: '0.75rem' }}>On Hand</th>
-                <th style={{ padding: '0.75rem' }}>Reserved</th>
-                <th style={{ padding: '0.75rem' }}>Available</th>
-                <th style={{ padding: '0.75rem' }}>Reorder Level</th>
-                <th style={{ padding: '0.75rem' }}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {inventoryList.map(item => (
-                <tr key={item.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                  <td style={{ padding: '0.75rem', fontWeight: 'bold' }}>{item.product_name}</td>
-                  <td style={{ padding: '0.75rem' }}>{item.on_hand}</td>
-                  <td style={{ padding: '0.75rem', color: '#eab308' }}>{item.reserved}</td>
-                  <td style={{ padding: '0.75rem', fontWeight: 'bold', color: '#16a34a' }}>{item.available}</td>
-                  <td style={{ padding: '0.75rem' }}>{item.reorder_level}</td>
-                  <td style={{ padding: '0.75rem' }}>
-                    {item.available <= item.reorder_level ? (
-                      <span style={{ background: '#fef2f2', color: '#dc2626', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-                        ⚠️ LOW STOCK
-                      </span>
-                    ) : (
-                      <span style={{ background: '#dcfce7', color: '#166534', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-                        IN STOCK
-                      </span>
-                    )}
-                  </td>
+      {/* =========================================================================
+          TAB 5: LIVE INVENTORY & REORDER HEALTH (inventory)
+          ========================================================================= */}
+      {currentTab === 'inventory' && (
+        <div className="admin-card">
+          <div className="admin-card-header">
+            <h3 className="admin-card-title">
+              <Package size={17} style={{ color: '#F47B20' }} />
+              <span>Live Warehouse Inventory & Reorder Monitoring</span>
+            </h3>
+            <div className="admin-card-header-actions">
+              <span className="badge-status instock">{inventoryList.length} Active SKUs</span>
+              {dashboardData?.low_stock_count > 0 && (
+                <span className="badge-status lowstock">{dashboardData.low_stock_count} Reorders Due</span>
+              )}
+            </div>
+          </div>
+
+          <div style={{ maxWidth: '360px', marginBottom: '16px' }}>
+            <div style={{ position: 'relative' }}>
+              <Search
+                size={15}
+                style={{
+                  position: 'absolute',
+                  left: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#64748B'
+                }}
+              />
+              <input
+                type="text"
+                className="admin-input"
+                style={{ paddingLeft: '34px' }}
+                placeholder="Search inventory items..."
+                value={inventorySearchQuery}
+                onChange={(e) => setInventorySearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="admin-table-container">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Product Item</th>
+                  <th>On Hand</th>
+                  <th>Reserved</th>
+                  <th>Available</th>
+                  <th>Reorder Level</th>
+                  <th>Stock Health</th>
                 </tr>
+              </thead>
+              <tbody>
+                {filteredInventory.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} style={{ textAlign: 'center', padding: '32px', color: '#64748B' }}>
+                      No inventory items found.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredInventory.map((item) => {
+                    const isLow = Number(item.available) <= Number(item.reorder_level);
+                    return (
+                      <tr key={item.id}>
+                        <td style={{ fontWeight: 700, color: '#FFFFFF' }}>{item.product_name}</td>
+                        <td>{item.on_hand}</td>
+                        <td style={{ color: '#F59E0B' }}>{item.reserved}</td>
+                        <td style={{ fontWeight: 700, color: isLow ? '#F87171' : '#10B981' }}>
+                          {item.available}
+                        </td>
+                        <td style={{ color: '#94A3B8' }}>{item.reorder_level}</td>
+                        <td>
+                          {isLow ? (
+                            <span className="badge-status lowstock">
+                              <AlertTriangle size={12} />
+                              <span>LOW STOCK</span>
+                            </span>
+                          ) : (
+                            <span className="badge-status instock">
+                              <Check size={12} />
+                              <span>IN STOCK</span>
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          TAB 6: AI CARPENTER ORDERS (ai)
+          ========================================================================= */}
+      {currentTab === 'ai' && (
+        <div className="admin-card">
+          <div className="admin-card-header">
+            <h3 className="admin-card-title">
+              <Sparkles size={17} style={{ color: '#F47B20' }} />
+              <span>AI Voice & WhatsApp Draft Orders Review</span>
+            </h3>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                className={`admin-action-btn ${aiFilter === 'REVIEW_REQUIRED' ? 'primary' : ''}`}
+                style={{ fontSize: '12px', padding: '6px 12px' }}
+                onClick={() => setAiFilter('REVIEW_REQUIRED')}
+              >
+                Needs Review ({aiJobs.filter((j) => j.status === 'REVIEW_REQUIRED').length})
+              </button>
+              <button
+                type="button"
+                className={`admin-action-btn ${aiFilter === 'ALL' ? 'primary' : ''}`}
+                style={{ fontSize: '12px', padding: '6px 12px' }}
+                onClick={() => setAiFilter('ALL')}
+              >
+                All Orders ({aiJobs.length})
+              </button>
+            </div>
+          </div>
+
+          {filteredAiJobs.length === 0 ? (
+            <div className="admin-empty-state">
+              <Sparkles className="admin-empty-icon" />
+              <p>No AI orders matching this filter. When carpenters send audio or text orders, they appear here.</p>
+            </div>
+          ) : (
+            <div className="admin-ai-grid">
+              {filteredAiJobs.map((job) => (
+                <div key={job.id} className="admin-ai-card" style={{ margin: 0, padding: '18px' }}>
+                  <div className="admin-ai-card-top">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span className="badge-status source">{job.source_type}</span>
+                      <strong style={{ fontSize: '14px', color: '#FFFFFF' }}>
+                        {job.detected_project || 'General Hardware Site'}
+                      </strong>
+                    </div>
+                    <span
+                      style={{
+                        fontSize: '11.5px',
+                        fontWeight: 700,
+                        color: Number(job.confidence_score) >= 80 ? '#10B981' : '#F59E0B'
+                      }}
+                    >
+                      {Number(job.confidence_score).toFixed(0)}% Confidence
+                    </span>
+                  </div>
+
+                  <div className="admin-ai-prompt" style={{ margin: '12px 0' }}>
+                    "{job.input_text}"
+                  </div>
+
+                  <div className="admin-ai-card-footer">
+                    <span
+                      className={`badge-status ${
+                        job.status === 'COMPLETED'
+                          ? 'paid'
+                          : job.status === 'FAILED'
+                          ? 'rejected'
+                          : 'review'
+                      }`}
+                    >
+                      {job.status}
+                    </span>
+
+                    {job.status === 'REVIEW_REQUIRED' && (
+                      <div className="admin-ai-actions">
+                        <button
+                          type="button"
+                          className="admin-action-btn"
+                          style={{ padding: '6px 12px', fontSize: '12px', color: '#F87171' }}
+                          onClick={() => handleApproveAIJob(job.id, 'REJECT')}
+                        >
+                          <X size={13} />
+                          <span>Reject</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-action-btn primary"
+                          style={{ padding: '6px 14px', fontSize: '12px', whiteSpace: 'nowrap' }}
+                          onClick={() => handleApproveAIJob(job.id, 'APPROVE')}
+                        >
+                          <Check size={13} />
+                          <span>Approve & Reserve</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* =========================================================================
+          MODAL: CREATE NEW CUSTOMER
+          ========================================================================= */}
+      {isCustomerModalOpen && (
+        <div className="admin-modal-backdrop" onClick={() => setIsCustomerModalOpen(false)}>
+          <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-card-header" style={{ marginBottom: '16px' }}>
+              <h3 className="admin-card-title">
+                <Users size={18} style={{ color: '#F47B20' }} />
+                <span>Add New Customer or Builder</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsCustomerModalOpen(false)}
+                style={{ background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateCustomer}>
+              <div className="admin-form-group">
+                <label className="admin-label">Full Name / Firm Name *</label>
+                <input
+                  type="text"
+                  required
+                  className="admin-input"
+                  placeholder="e.g. Ramesh Sharma"
+                  value={newCustomer.name}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, name: e.target.value })}
+                />
+              </div>
+
+              <div className="admin-form-group">
+                <label className="admin-label">Mobile Number *</label>
+                <input
+                  type="tel"
+                  required
+                  className="admin-input"
+                  placeholder="e.g. 9876543210"
+                  value={newCustomer.phone}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
+                />
+              </div>
+
+              <div className="admin-form-group">
+                <label className="admin-label">Customer Type</label>
+                <select
+                  className="admin-select"
+                  value={newCustomer.customer_type}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, customer_type: e.target.value })}
+                >
+                  <option value="RETAIL">Retail Customer</option>
+                  <option value="CONTRACTOR">Contractor / Builder</option>
+                  <option value="CARPENTER">Carpenter Partner</option>
+                  <option value="HOMEOWNER">Homeowner</option>
+                </select>
+              </div>
+
+              <div className="admin-form-group">
+                <label className="admin-label">Initial Opening Khata Balance (₹)</label>
+                <input
+                  type="number"
+                  min="0"
+                  className="admin-input"
+                  placeholder="0"
+                  value={newCustomer.opening_balance}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, opening_balance: e.target.value })}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+                <button
+                  type="button"
+                  className="admin-action-btn"
+                  onClick={() => setIsCustomerModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="admin-action-btn primary">
+                  <Plus size={14} />
+                  <span>Create Customer</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          MODAL: RECORD PAYMENT RECEIVED
+          ========================================================================= */}
+      {isPaymentModalOpen && (
+        <div className="admin-modal-backdrop" onClick={() => setIsPaymentModalOpen(false)}>
+          <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-card-header" style={{ marginBottom: '16px' }}>
+              <h3 className="admin-card-title">
+                <CircleDollarSign size={18} style={{ color: '#10B981' }} />
+                <span>Record Payment for Khata</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsPaymentModalOpen(false)}
+                style={{ background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleRecordPayment}>
+              <div className="admin-form-group">
+                <label className="admin-label">Select Unpaid Invoice *</label>
+                <select
+                  required
+                  className="admin-select"
+                  value={paymentForm.invoice_id}
+                  onChange={(e) => {
+                    const inv = customerUnpaidInvoices.find((i) => i.id === e.target.value);
+                    setPaymentForm({
+                      ...paymentForm,
+                      invoice_id: e.target.value,
+                      amount: inv ? String(inv.outstanding) : ''
+                    });
+                  }}
+                >
+                  <option value="">-- Choose Invoice --</option>
+                  {customerUnpaidInvoices.map((inv) => (
+                    <option key={inv.id} value={inv.id}>
+                      {inv.invoice_number} - Total: {formatINR(inv.total)} (Due: {formatINR(inv.outstanding)})
+                    </option>
+                  ))}
+                </select>
+                {customerUnpaidInvoices.length === 0 && (
+                  <small style={{ color: '#F87171', display: 'block', marginTop: '4px' }}>
+                    No pending invoices with outstanding balances found for this customer.
+                  </small>
+                )}
+              </div>
+
+              <div className="admin-form-group">
+                <label className="admin-label">Amount Received (₹) *</label>
+                <input
+                  type="number"
+                  min="1"
+                  step="0.01"
+                  required
+                  className="admin-input"
+                  placeholder="e.g. 5000"
+                  value={paymentForm.amount}
+                  onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
+                />
+              </div>
+
+              <div className="admin-form-group">
+                <label className="admin-label">Payment Method</label>
+                <select
+                  className="admin-select"
+                  value={paymentForm.method}
+                  onChange={(e) => setPaymentForm({ ...paymentForm, method: e.target.value })}
+                >
+                  <option value="CASH">Cash</option>
+                  <option value="UPI">UPI / QR Code</option>
+                  <option value="BANK_TRANSFER">Bank Transfer (NEFT/RTGS)</option>
+                  <option value="CARD">Debit / Credit Card</option>
+                </select>
+              </div>
+
+              <div className="admin-form-group">
+                <label className="admin-label">Transaction Reference (Optional)</label>
+                <input
+                  type="text"
+                  className="admin-input"
+                  placeholder="UPI Txn ID or Cheque #"
+                  value={paymentForm.reference}
+                  onChange={(e) => setPaymentForm({ ...paymentForm, reference: e.target.value })}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+                <button
+                  type="button"
+                  className="admin-action-btn"
+                  onClick={() => setIsPaymentModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="admin-action-btn primary"
+                  disabled={customerUnpaidInvoices.length === 0}
+                >
+                  <Check size={14} />
+                  <span>Confirm Payment</span>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

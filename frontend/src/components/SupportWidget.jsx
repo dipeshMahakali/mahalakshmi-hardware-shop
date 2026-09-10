@@ -1,14 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-import { Headphones, MessageSquare, PhoneCall, FileText, CheckCircle, ShoppingBag, Heart, Send, Trash } from 'lucide-react';
-import { useShop } from '../context/ShopContext';
+import { Headphones, MessageSquare, PhoneCall, FileText } from 'lucide-react';
+import { useShop } from '../context/ShopContext.jsx';
+import { buildWhatsAppLink } from '../utils/whatsapp.js';
 
-const toastIcons = {
-  'check-circle': CheckCircle,
-  'shopping-bag': ShoppingBag,
-  'heart': Heart,
-  'send': Send,
-  'trash': Trash
-};
+export { ToastContainer } from '../components/feedback/ToastContainer.jsx';
 
 export function SupportWidget() {
   const { isSupportOpen, setIsSupportOpen, setIsQuoteModalOpen } = useShop();
@@ -27,11 +22,15 @@ export function SupportWidget() {
 
   return (
     <div className={`floating-support-container ${isSupportOpen ? 'is-open' : ''}`} id="support-widget-container" ref={supportRef}>
-      
       <div className="support-popup-panel">
         <div className="support-panel-header">How can we help you?</div>
         
-        <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="support-option-item">
+        <a 
+          href={buildWhatsAppLink('919876543210', 'Hello Shree Mahalaxmi Hardware! I need assistance with product specifications.')} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="support-option-item"
+        >
           <MessageSquare size={18} style={{ color: '#25D366' }} />
           <span>WhatsApp Expert Chat</span>
         </a>
@@ -43,7 +42,7 @@ export function SupportWidget() {
         
         <button 
           className="support-option-item" 
-          style={{ width: '100%', border: 'none', textAlign: 'left', cursor: 'pointer' }}
+          style={{ width: '100%', border: 'none', textAlign: 'left', cursor: 'pointer', background: 'none' }}
           onClick={() => {
             setIsSupportOpen(false);
             setIsQuoteModalOpen(true);
@@ -54,30 +53,11 @@ export function SupportWidget() {
         </button>
       </div>
 
-      <button className="floating-support-btn" onClick={() => setIsSupportOpen(!isSupportOpen)}>
+      <button className="floating-support-btn" onClick={() => setIsSupportOpen(!isSupportOpen)} aria-label="Open support menu">
         <span className="support-pulse-dot"></span>
         <Headphones size={18} />
         <span>Need Help?</span>
       </button>
-
-    </div>
-  );
-}
-
-export function ToastContainer() {
-  const { toasts } = useShop();
-
-  return (
-    <div className="toast-container">
-      {toasts.map(t => {
-        const IconComponent = toastIcons[t.icon] || CheckCircle;
-        return (
-          <div key={t.id} className="toast-message">
-            <IconComponent size={18} />
-            <span>{t.message}</span>
-          </div>
-        );
-      })}
     </div>
   );
 }
