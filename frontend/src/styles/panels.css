@@ -634,26 +634,161 @@
   color: #94A3B8;
   margin-bottom: 6px;
 }
-.admin-input, .admin-select, .admin-textarea {
-  width: 100%;
-  box-sizing: border-box;
-  background: #0E1013;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  padding: 10px 14px;
-  color: #FFFFFF;
-  font-size: 13.5px;
-  font-family: inherit;
-  outline: none;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+/* Master Form Controls Selector for Admin & Partner Portals */
+.panel-app input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.panel-app textarea,
+.panel-app select,
+.admin-panel-app input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.admin-panel-app textarea,
+.admin-panel-app select,
+.admin-cms-hub input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.admin-cms-hub textarea,
+.admin-cms-hub select,
+.admin-card input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.admin-card textarea,
+.admin-card select,
+.admin-panel-app .form-input,
+.admin-panel-app .form-select,
+.admin-panel-app .form-textarea,
+.admin-cms-hub .form-input,
+.admin-cms-hub .form-select,
+.admin-cms-hub .form-textarea,
+.admin-card .form-input,
+.admin-card .form-select,
+.admin-card .form-textarea,
+.panel-card .form-input,
+.panel-card .form-select,
+.panel-card .form-textarea,
+.admin-input, 
+.admin-select, 
+.admin-textarea {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  background-color: #0E1013 !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-size: 13.5px !important;
+  font-family: inherit !important;
+  line-height: 1.5 !important;
+  outline: none !important;
+  caret-color: #F47B20 !important;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast) !important;
 }
-.admin-input:focus, .admin-select:focus, .admin-textarea:focus {
-  border-color: #F47B20;
-  box-shadow: 0 0 0 3px rgba(244, 123, 32, 0.15);
+
+/* Placeholder styling with crisp contrast */
+.panel-app input::placeholder,
+.panel-app textarea::placeholder,
+.admin-panel-app input::placeholder,
+.admin-panel-app textarea::placeholder,
+.admin-cms-hub input::placeholder,
+.admin-cms-hub textarea::placeholder,
+.admin-card input::placeholder,
+.admin-card textarea::placeholder,
+.admin-input::placeholder,
+.admin-textarea::placeholder,
+.admin-panel-app .form-input::placeholder,
+.admin-panel-app .form-textarea::placeholder,
+.admin-cms-hub .form-input::placeholder,
+.admin-cms-hub .form-textarea::placeholder,
+.admin-card .form-input::placeholder,
+.admin-card .form-textarea::placeholder {
+  color: #71717A !important;
+  -webkit-text-fill-color: #71717A !important;
+  opacity: 1 !important;
 }
+
+/* Active / Focus State with warm saffron highlight */
+.panel-app input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+.panel-app textarea:focus,
+.panel-app select:focus,
+.admin-panel-app input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+.admin-panel-app textarea:focus,
+.admin-panel-app select:focus,
+.admin-cms-hub input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+.admin-cms-hub textarea:focus,
+.admin-cms-hub select:focus,
+.admin-card input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+.admin-card textarea:focus,
+.admin-card select:focus,
+.admin-panel-app .form-input:focus,
+.admin-panel-app .form-select:focus,
+.admin-panel-app .form-textarea:focus,
+.admin-cms-hub .form-input:focus,
+.admin-cms-hub .form-select:focus,
+.admin-cms-hub .form-textarea:focus,
+.admin-card .form-input:focus,
+.admin-card .form-select:focus,
+.admin-card .form-textarea:focus,
+.admin-input:focus, 
+.admin-select:focus, 
+.admin-textarea:focus {
+  background-color: #14171D !important;
+  border-color: #F47B20 !important;
+  box-shadow: 0 0 0 3px rgba(244, 123, 32, 0.22) !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
+/* Hover state */
+.panel-app input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):hover:not(:focus),
+.panel-app textarea:hover:not(:focus),
+.panel-app select:hover:not(:focus),
+.admin-panel-app input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):hover:not(:focus),
+.admin-panel-app textarea:hover:not(:focus),
+.admin-panel-app select:hover:not(:focus),
+.admin-cms-hub input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):hover:not(:focus),
+.admin-cms-hub textarea:hover:not(:focus),
+.admin-cms-hub select:hover:not(:focus),
+.admin-card input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):hover:not(:focus),
+.admin-card textarea:hover:not(:focus),
+.admin-card select:hover:not(:focus),
+.admin-input:hover:not(:focus),
+.admin-select:hover:not(:focus),
+.admin-textarea:hover:not(:focus) {
+  border-color: rgba(255, 255, 255, 0.28) !important;
+}
+
+/* Disabled state */
+.panel-app input:disabled,
+.panel-app textarea:disabled,
+.panel-app select:disabled,
+.admin-panel-app input:disabled,
+.admin-panel-app textarea:disabled,
+.admin-panel-app select:disabled {
+  background-color: #090A0D !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #52525B !important;
+  -webkit-text-fill-color: #52525B !important;
+  cursor: not-allowed !important;
+}
+
+/* Dropdown options styling */
+.panel-app select option,
+.admin-panel-app select option,
+.admin-cms-hub select option,
+.admin-card select option,
 .admin-select option {
-  background: #15181E;
-  color: #FFFFFF;
+  background-color: #15181E !important;
+  color: #FFFFFF !important;
+  padding: 8px 12px;
+}
+
+/* Browser autofill styling to prevent light blue/white flash */
+.panel-app input:-webkit-autofill,
+.panel-app textarea:-webkit-autofill,
+.panel-app select:-webkit-autofill,
+.admin-panel-app input:-webkit-autofill,
+.admin-panel-app textarea:-webkit-autofill,
+.admin-panel-app select:-webkit-autofill,
+.admin-cms-hub input:-webkit-autofill,
+.admin-cms-hub textarea:-webkit-autofill,
+.admin-cms-hub select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #0E1013 inset !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  caret-color: #FFFFFF !important;
 }
 
 /* Billing Grid */
