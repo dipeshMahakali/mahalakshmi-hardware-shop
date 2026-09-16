@@ -1,6 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -67,21 +67,107 @@ class ProductAliasResponse(ProductAliasCreate):
     product_id: str
 
 
+class ProductCategoryCreate(BaseModel):
+    name: str = Field(min_length=2, max_length=100)
+    slug: str = Field(min_length=2, max_length=100)
+    description: str | None = None
+    icon: str = "door-open"
+    tagline: str | None = None
+    product_count_label: str | None = "100+ Products"
+    display_order: int = 0
+    is_active: bool = True
+    is_featured_landing: bool = True
+
+
+class ProductCategoryUpdate(BaseModel):
+    name: str | None = None
+    slug: str | None = None
+    description: str | None = None
+    icon: str | None = None
+    tagline: str | None = None
+    product_count_label: str | None = None
+    display_order: int | None = None
+    is_active: bool | None = None
+    is_featured_landing: bool | None = None
+
+
+class ProductCategoryResponse(ProductCategoryCreate):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    created_at: datetime | None = None
+
+
 class ProductCreate(BaseModel):
     name: str = Field(min_length=2, max_length=180)
     sku: str = Field(min_length=2, max_length=80)
     barcode: str | None = None
-    category: str | None = "Hardware"
+    category_id: str | None = None
+    category: str | None = "Door Hardware"
     brand: str | None = "Generic"
+    subtitle: str | None = None
     unit: str = "piece"
     purchase_price: Decimal = Field(default=Decimal("0"), ge=0)
     selling_price: Decimal = Field(gt=0)
+    original_price: Decimal | None = None
+    discount_percentage: int = 0
     min_selling_price: Decimal | None = None
     tax_rate: Decimal = Field(default=Decimal("0"), ge=0, le=100)
     hsn_sac: str | None = None
+    badge: str | None = None
+    badge_type: str | None = "bestseller"
+    material: str | None = None
+    finish: str | None = None
+    warranty: str | None = None
+    rating: Decimal = Decimal("4.8")
+    review_count: int = 24
+    illustration_type: str | None = "handle_lever"
+    is_bestseller: bool = False
+    is_recommended: bool = False
+    display_order: int = 0
     description: str | None = None
     image_url: str | None = None
+    is_active: bool = True
     aliases: list[str] = []
+
+
+class ProductUpdate(BaseModel):
+    name: str | None = None
+    sku: str | None = None
+    barcode: str | None = None
+    category_id: str | None = None
+    category: str | None = None
+    brand: str | None = None
+    subtitle: str | None = None
+    unit: str | None = None
+    purchase_price: Decimal | None = None
+    selling_price: Decimal | None = None
+    original_price: Decimal | None = None
+    discount_percentage: int | None = None
+    min_selling_price: Decimal | None = None
+    tax_rate: Decimal | None = None
+    hsn_sac: str | None = None
+    badge: str | None = None
+    badge_type: str | None = None
+    material: str | None = None
+    finish: str | None = None
+    warranty: str | None = None
+    rating: Decimal | None = None
+    review_count: int | None = None
+    illustration_type: str | None = None
+    is_bestseller: bool | None = None
+    is_recommended: bool | None = None
+    display_order: int | None = None
+    description: str | None = None
+    image_url: str | None = None
+    is_active: bool | None = None
+
+
+class ShowcaseCurationPatch(BaseModel):
+    is_bestseller: bool | None = None
+    is_recommended: bool | None = None
+    is_active: bool | None = None
+    badge: str | None = None
+    display_order: int | None = None
 
 
 class ProductResponse(BaseModel):
@@ -90,12 +176,27 @@ class ProductResponse(BaseModel):
     name: str
     sku: str
     barcode: str | None = None
+    category_id: str | None = None
     category: str | None = None
     brand: str | None = None
+    subtitle: str | None = None
     unit: str
     purchase_price: Decimal
     selling_price: Decimal
+    original_price: Decimal | None = None
+    discount_percentage: int = 0
     tax_rate: Decimal
+    badge: str | None = None
+    badge_type: str | None = None
+    material: str | None = None
+    finish: str | None = None
+    warranty: str | None = None
+    rating: Decimal = Decimal("4.8")
+    review_count: int = 24
+    illustration_type: str | None = None
+    is_bestseller: bool = False
+    is_recommended: bool = False
+    display_order: int = 0
     description: str | None = None
     image_url: str | None = None
     is_active: bool
@@ -373,3 +474,42 @@ class AIApprovalRequest(BaseModel):
     job_id: str
     action: Literal["APPROVE", "REJECT"]
     edited_items: list[dict] | None = None
+
+
+class StorefrontContentUpdate(BaseModel):
+    content: Any = Field(default_factory=dict)
+
+
+class StorefrontContentResponse(BaseModel):
+    section_key: str
+    content: Any
+    updated_at: datetime | None = None
+
+
+class CartItemSync(BaseModel):
+    product_id: str
+    product_name: str
+    sku: str | None = None
+    unit_price: Decimal = Decimal("0")
+    quantity: int = Field(gt=0)
+    image_url: str | None = None
+
+
+class CartSyncRequest(BaseModel):
+    session_token: str
+    customer_name: str | None = None
+    customer_phone: str | None = None
+    items: list[CartItemSync] = []
+
+
+class WishlistSyncRequest(BaseModel):
+    session_token: str
+    product_ids: list[str] = []
+
+
+class EngagementOverviewResponse(BaseModel):
+    total_active_carts: int
+    total_cart_pipeline_value: Decimal
+    total_wishlisted_items: int
+    active_carts: list[dict]
+    top_wishlisted_products: list[dict]

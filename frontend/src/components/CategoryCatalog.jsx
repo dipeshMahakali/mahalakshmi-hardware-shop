@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { 
   Home, ChevronRight, SlidersHorizontal, Grid, List, Search, 
   ShieldCheck, FileText, ArrowRight, Sparkles, Filter, X, Check
@@ -8,6 +8,15 @@ import { ProductCard } from './ProductCard.jsx';
 import { HardwareSVG } from './graphics/HardwareIllustrations.jsx';
 import { SelectDropdown } from './SelectDropdown.jsx';
 import { useDebounce } from '../hooks/useDebounce.js';
+
+function normalizeSlug(str) {
+  return (str || '')
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 const MATERIAL_OPTIONS = [
   { value: 'all', label: 'All Materials' },
@@ -35,7 +44,7 @@ const SORT_OPTIONS = [
 ];
 
 export function CategoryCatalog() {
-  const { products, categories, activeCategory, setActiveCategory, setIsQuoteModalOpen } = useShop();
+  const { products, categories, activeCategory, setActiveCategory, navigateToHome, setIsQuoteModalOpen } = useShop();
   
   const [sortBy, setSortBy] = useState('featured');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
@@ -45,22 +54,63 @@ export function CategoryCatalog() {
   const [localSearch, setLocalSearch] = useState('');
   
   const debouncedSearch = useDebounce(localSearch, 250);
+  const activeTabRef = useRef(null);
+
+  // Auto-scroll active category pill into view
+  useEffect(() => {
+    if (activeTabRef.current) {
+      activeTabRef.current.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, [activeCategory]);
 
   // Find active category details
-  const currentCategory = (categories || []).find(c => c.id === activeCategory) || {
-    id: 'all',
-    name: 'All Architectural Catalogs',
-    description: 'Explore our complete catalog of door hardware, biometric locks, soft close hinges, plywood, and cabinet accessories.',
-    tagline: 'Precision engineered architectural hardware designed for modern homes and commercial spaces.'
-  };
+  const currentCategory = useMemo(() => {
+    if (!activeCategory || activeCategory === 'all' || activeCategory === 'catalog') {
+      return {
+        id: 'all',
+        name: 'All Architectural Catalogs',
+        description: 'Explore our complete catalog of door hardware, biometric locks, soft close hinges, plywood, and cabinet accessories.',
+        tagline: 'Precision engineered architectural hardware designed for modern homes and commercial spaces.',
+        type: 'door_hardware'
+      };
+    }
+    const normTarget = normalizeSlug(activeCategory);
+    return (categories || []).find(c => {
+      const cSlug = normalizeSlug(c.slug || c.id);
+      const cName = normalizeSlug(c.name);
+      return c.id === activeCategory || cSlug === normTarget || cName === normTarget;
+    }) || {
+      id: activeCategory,
+      name: activeCategory.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      description: 'Explore our premium selection crafted for strength, security, and architectural beauty.',
+      tagline: 'Precision engineered architectural hardware designed for modern spaces.',
+      type: 'door_hardware'
+    };
+  }, [categories, activeCategory]);
 
   // Multi-facet filtering logic
   const filteredProducts = useMemo(() => {
     let list = products || [];
 
-    // Category filter
-    if (activeCategory !== 'all') {
-      list = list.filter(p => p.categoryId === activeCategory);
+    // Category filter with resilient multi-attribute normalization
+    if (activeCategory && activeCategory !== 'all' && activeCategory !== 'catalog') {
+      const targetSlug = normalizeSlug(activeCategory);
+      list = list.filter(p => {
+        const pCatId = normalizeSlug(p.categoryId);
+        const pCatDbId = normalizeSlug(p.category_id);
+        const pCatName = normalizeSlug(p.category);
+        const pRawCat = (p.category || '').toLowerCase().trim();
+        const rawTarget = activeCategory.toLowerCase().trim();
+
+        return (
+          pCatId === targetSlug ||
+          pCatDbId === targetSlug ||
+          pCatName === targetSlug ||
+          pRawCat === rawTarget ||
+          p.category_id === activeCategory ||
+          p.categoryId === activeCategory
+        );
+      });
     }
 
     // Material filter
@@ -125,7 +175,7 @@ export function CategoryCatalog() {
       {/* Breadcrumb Navigation Bar */}
       <div className="catalog-breadcrumb-bar">
         <div className="container breadcrumb-container">
-          <button className="breadcrumb-link" onClick={() => setActiveCategory('all')}>
+          <button className="breadcrumb-link" onClick={() => navigateToHome ? navigateToHome() : setActiveCategory('home')}>
             <Home size={14} /> Home
           </button>
           <ChevronRight size={14} className="breadcrumb-separator" />
@@ -149,20 +199,29 @@ export function CategoryCatalog() {
             {/* Category Switcher Tabs */}
             <div className="category-tabs-scroll">
               <button 
-                className={`category-tab-btn ${activeCategory === 'all' ? 'is-active' : ''}`}
+                ref={(!activeCategory || activeCategory === 'all' || activeCategory === 'catalog') ? activeTabRef : null}
+                className={`category-tab-btn ${(!activeCategory || activeCategory === 'all' || activeCategory === 'catalog') ? 'is-active' : ''}`}
                 onClick={() => setActiveCategory('all')}
               >
                 All Products
               </button>
-              {(categories || []).map(c => (
-                <button 
-                  key={c.id}
-                  className={`category-tab-btn ${activeCategory === c.id ? 'is-active' : ''}`}
-                  onClick={() => setActiveCategory(c.id)}
-                >
-                  {c.name}
-                </button>
-              ))}
+              {(categories || []).map(c => {
+                const isActive = (
+                  activeCategory === c.id ||
+                  normalizeSlug(activeCategory) === normalizeSlug(c.slug || c.id) ||
+                  normalizeSlug(activeCategory) === normalizeSlug(c.name)
+                );
+                return (
+                  <button 
+                    key={c.id}
+                    ref={isActive ? activeTabRef : null}
+                    className={`category-tab-btn ${isActive ? 'is-active' : ''}`}
+                    onClick={() => setActiveCategory(c.id)}
+                  >
+                    {c.name}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

@@ -4,7 +4,8 @@ import { HardwareSVG } from './graphics/HardwareIllustrations.jsx';
 import { useShop } from '../context/ShopContext.jsx';
 
 export function PromoBanner() {
-  const { setActiveCategory } = useShop();
+  const { setActiveCategory, siteContent } = useShop();
+  const promo = siteContent?.promo_banner || {};
   const [sheenPos, setSheenPos] = useState({ x: 0, y: 0 });
 
   const handleMouseMove = (e) => {
@@ -28,44 +29,44 @@ export function PromoBanner() {
             <div className="promo-content">
               <div className="promo-badge">
                 <Crown size={14} />
-                <span>ARCHITECTURAL EXCELLENCE</span>
+                <span>{promo.badge || 'ARCHITECTURAL EXCELLENCE'}</span>
               </div>
 
               <h2 className="promo-title">
-                The Matte Black <br />
-                <span className="highlight-orange">Heritage Collection</span>
+                {promo.title_main || 'The Matte Black'} <br />
+                <span className="highlight-orange">{promo.title_highlight || 'Heritage Collection'}</span>
               </h2>
 
               <p className="promo-description">
-                Transform residential and commercial doors with precision-milled solid zinc handles, anti-corrosion finishes, and Japanese magnetic latch technology.
+                {promo.description || 'Transform residential and commercial doors with precision-milled solid zinc handles, anti-corrosion finishes, and Japanese magnetic latch technology.'}
               </p>
 
               <div className="promo-features">
                 <div className="promo-feature-item">
                   <CheckCircle size={16} />
-                  <span>10-Year Mechanical Warranty</span>
+                  <span>{promo.feature_1 || '10-Year Mechanical Warranty'}</span>
                 </div>
                 <div className="promo-feature-item">
                   <Award size={16} />
-                  <span>Grade 304 Stainless Steel Core</span>
+                  <span>{promo.feature_2 || 'Grade 304 Stainless Steel Core'}</span>
                 </div>
                 <div className="promo-feature-item">
                   <Sparkles size={16} />
-                  <span>Zero-Fingerprint PVD Coating</span>
+                  <span>{promo.feature_3 || 'Zero-Fingerprint PVD Coating'}</span>
                 </div>
               </div>
 
               <div className="promo-actions">
                 <button 
-                  onClick={() => setActiveCategory('door-hardware')} 
+                  onClick={() => setActiveCategory(promo.cta_link || 'door-hardware')} 
                   className="btn-primary"
                 >
-                  <span>Explore Collection</span>
+                  <span>{promo.cta_text || 'Explore Collection'}</span>
                   <ArrowRight size={18} />
                 </button>
                 <div className="promo-limited-tag">
                   <Tag size={14} />
-                  <span>Trade Pricing Available</span>
+                  <span>{promo.limited_tag || 'Trade Pricing Available'}</span>
                 </div>
               </div>
             </div>
@@ -77,11 +78,11 @@ export function PromoBanner() {
               </div>
               <div className="promo-spec-chip chip-top">
                 <span className="chip-dot"></span>
-                <span>PVD Matte Black</span>
+                <span>{promo.chip_top || 'PVD Matte Black'}</span>
               </div>
               <div className="promo-spec-chip chip-bottom">
                 <span className="chip-dot"></span>
-                <span>Japanese Magnetic Latch</span>
+                <span>{promo.chip_bottom || 'Japanese Magnetic Latch'}</span>
               </div>
             </div>
           </div>

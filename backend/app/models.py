@@ -72,6 +72,12 @@ class ProductCategory(Base):
     name: Mapped[str] = mapped_column(String(100), unique=True, index=True)
     slug: Mapped[str] = mapped_column(String(100), unique=True)
     description: Mapped[str | None] = mapped_column(Text)
+    icon: Mapped[str] = mapped_column(String(50), default="door-open")
+    tagline: Mapped[str | None] = mapped_column(String(255))
+    product_count_label: Mapped[str | None] = mapped_column(String(50), default="100+ Products")
+    display_order: Mapped[int] = mapped_column(Integer, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_featured_landing: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     products: Mapped[list["Product"]] = relationship(back_populates="category_rel")
@@ -96,12 +102,26 @@ class Product(Base):
     brand_id: Mapped[str | None] = mapped_column(ForeignKey("product_brands.id"))
     category: Mapped[str | None] = mapped_column(String(80))
     brand: Mapped[str | None] = mapped_column(String(80))
+    subtitle: Mapped[str | None] = mapped_column(String(180))
     unit: Mapped[str] = mapped_column(String(30), default="piece")
     purchase_price: Mapped[Decimal] = mapped_column(Numeric(12, 2), default=0)
     selling_price: Mapped[Decimal] = mapped_column(Numeric(12, 2))
+    original_price: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
+    discount_percentage: Mapped[int] = mapped_column(Integer, default=0)
     min_selling_price: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
     tax_rate: Mapped[Decimal] = mapped_column(Numeric(5, 2), default=0)
     hsn_sac: Mapped[str | None] = mapped_column(String(30))
+    badge: Mapped[str | None] = mapped_column(String(50))
+    badge_type: Mapped[str | None] = mapped_column(String(30), default="bestseller")
+    material: Mapped[str | None] = mapped_column(String(120))
+    finish: Mapped[str | None] = mapped_column(String(120))
+    warranty: Mapped[str | None] = mapped_column(String(120))
+    rating: Mapped[Decimal] = mapped_column(Numeric(3, 1), default=4.8)
+    review_count: Mapped[int] = mapped_column(Integer, default=24)
+    illustration_type: Mapped[str | None] = mapped_column(String(60), default="handle_lever")
+    is_bestseller: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_recommended: Mapped[bool] = mapped_column(Boolean, default=False)
+    display_order: Mapped[int] = mapped_column(Integer, default=0)
     description: Mapped[str | None] = mapped_column(Text)
     image_url: Mapped[str | None] = mapped_column(String(255))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
@@ -397,3 +417,51 @@ class SystemSetting(Base):
     key: Mapped[str] = mapped_column(String(80), unique=True, index=True)
     value: Mapped[str] = mapped_column(Text)
     description: Mapped[str | None] = mapped_column(Text)
+
+
+class StorefrontContent(Base):
+    __tablename__ = "storefront_content"
+    section_key: Mapped[str] = mapped_column(String(80), primary_key=True)
+    content_json: Mapped[str] = mapped_column(Text)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
+
+
+class CartSession(Base):
+    __tablename__ = "cart_sessions"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    session_token: Mapped[str] = mapped_column(String(80), unique=True, index=True)
+    customer_id: Mapped[str | None] = mapped_column(ForeignKey("customers.id"), nullable=True)
+    customer_name: Mapped[str | None] = mapped_column(String(120))
+    customer_phone: Mapped[str | None] = mapped_column(String(30))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    items: Mapped[list["CartSessionItem"]] = relationship(cascade="all, delete-orphan", back_populates="cart_session")
+
+
+class CartSessionItem(Base):
+    __tablename__ = "cart_session_items"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    session_id: Mapped[str] = mapped_column(ForeignKey("cart_sessions.id"), index=True)
+    product_id: Mapped[str] = mapped_column(ForeignKey("products.id"), index=True)
+    product_name: Mapped[str] = mapped_column(String(180))
+    sku: Mapped[str | None] = mapped_column(String(80))
+    unit_price: Mapped[Decimal] = mapped_column(Numeric(12, 2), default=0)
+    quantity: Mapped[int] = mapped_column(Integer, default=1)
+    image_url: Mapped[str | None] = mapped_column(String(255))
+    updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
+
+    cart_session: Mapped[CartSession] = relationship(back_populates="items")
+    product: Mapped[Product] = relationship()
+
+
+class WishlistItem(Base):
+    __tablename__ = "wishlist_items"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    session_token: Mapped[str] = mapped_column(String(80), index=True)
+    customer_id: Mapped[str | None] = mapped_column(ForeignKey("customers.id"), nullable=True)
+    product_id: Mapped[str] = mapped_column(ForeignKey("products.id"), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    product: Mapped[Product] = relationship()

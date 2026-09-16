@@ -1,4 +1,21 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (typeof window !== 'undefined') {
+    // When served via Vite dev server (port 5173), use relative URL to route via Vite reverse-proxy
+    if (window.location.port === '5173') {
+      return '';
+    }
+    // Fallback for LAN IP / standalone: route to port 8000 on the same host
+    if (window.location.hostname) {
+      return `${window.location.protocol}//${window.location.hostname}:8000`;
+    }
+  }
+  return 'http://localhost:8000';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 async function request(path, options = {}) {
   const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -40,6 +57,19 @@ export const businessApi = {
   projects: (token, customerId) =>
     request(`/api/v1/customers/${customerId}/projects`),
 
+  // Categories
+  categories: (params = {}) => {
+    const q = new URLSearchParams(params).toString();
+    return request(`/api/v1/categories${q ? '?' + q : ''}`);
+  },
+  getCategory: (id) => request(`/api/v1/categories/${id}`),
+  createCategory: (token, category) =>
+    request('/api/v1/categories', { method: 'POST', body: JSON.stringify(category) }),
+  updateCategory: (token, id, category) =>
+    request(`/api/v1/categories/${id}`, { method: 'PUT', body: JSON.stringify(category) }),
+  deleteCategory: (token, id) =>
+    request(`/api/v1/categories/${id}`, { method: 'DELETE' }),
+
   // Products
   products: (token, params = {}) => {
     const q = new URLSearchParams(params).toString();
@@ -47,6 +77,23 @@ export const businessApi = {
   },
   createProduct: (token, product) =>
     request('/api/v1/products', { method: 'POST', body: JSON.stringify(product) }),
+  updateProduct: (token, id, product) =>
+    request(`/api/v1/products/${id}`, { method: 'PUT', body: JSON.stringify(product) }),
+  patchProductCuration: (token, id, curation) =>
+    request(`/api/v1/products/${id}/curation`, { method: 'PATCH', body: JSON.stringify(curation) }),
+  deleteProduct: (token, id) =>
+    request(`/api/v1/products/${id}`, { method: 'DELETE' }),
+
+  // Storefront CMS & Audience Telemetry
+  getStorefrontContent: () => request('/api/v1/storefront/content'),
+  updateStorefrontContent: (token, sectionKey, content) =>
+    request(`/api/v1/storefront/content/${sectionKey}`, { method: 'PUT', body: JSON.stringify({ content }) }),
+  syncStorefrontCart: (payload) =>
+    request('/api/v1/storefront/cart/sync', { method: 'POST', body: JSON.stringify(payload) }),
+  syncStorefrontWishlist: (payload) =>
+    request('/api/v1/storefront/wishlist/sync', { method: 'POST', body: JSON.stringify(payload) }),
+  getStorefrontEngagement: (token) =>
+    request('/api/v1/storefront/engagement'),
 
   // Billing & Invoices
   createInvoice: (token, invoice) =>

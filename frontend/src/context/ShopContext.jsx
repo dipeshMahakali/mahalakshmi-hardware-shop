@@ -1,11 +1,27 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CATEGORIES as DEFAULT_CATEGORIES } from '../data/products.js';
 import { useProducts } from '../hooks/useProducts.js';
+import { useSiteContent } from '../hooks/useSiteContent.js';
+import { businessApi } from '../api/businessApi.js';
 
 const ShopContext = createContext();
 
+function getSessionToken() {
+  try {
+    let token = localStorage.getItem('smh_session_token');
+    if (!token) {
+      token = 'sess_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
+      localStorage.setItem('smh_session_token', token);
+    }
+    return token;
+  } catch {
+    return 'sess_fallback_' + Date.now();
+  }
+}
+
 export function ShopProvider({ children }) {
   const { products, categories, isLive, loading: productsLoading, refetch: refetchProducts } = useProducts();
+  const { content: siteContent, loading: siteContentLoading, isLive: isSiteContentLive, refetch: refetchSiteContent, updateSection: updateSiteContent } = useSiteContent();
 
   const [cart, setCart] = useState(() => {
     try {
@@ -21,6 +37,12 @@ export function ShopProvider({ children }) {
     } catch {
       return [];
     }
+  });
+
+  const [isCatalogView, setIsCatalogView] = useState(() => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash === 'catalog' || hash === 'catalogs' || hash === 'all-products') return true;
+    return DEFAULT_CATEGORIES.some(c => c.id === hash);
   });
 
   const [activeCategory, setActiveCategoryState] = useState(() => {
@@ -41,11 +63,20 @@ export function ShopProvider({ children }) {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
+      const validCategories = categories && categories.length > 0 ? categories : DEFAULT_CATEGORIES;
+
       if (hash === '' || hash === 'hero' || hash === 'home') {
+        setIsCatalogView(false);
+        setActiveCategoryState('all');
+      } else if (hash === 'catalog' || hash === 'catalogs' || hash === 'all-products') {
+        setIsCatalogView(true);
         setActiveCategoryState('all');
       } else {
-        const valid = (categories || DEFAULT_CATEGORIES).some(c => c.id === hash);
-        if (valid) setActiveCategoryState(hash);
+        const found = validCategories.find(c => c.id === hash || (c.slug && c.slug === hash));
+        if (found) {
+          setIsCatalogView(true);
+          setActiveCategoryState(found.id);
+        }
       }
     };
     window.addEventListener('hashchange', handleHashChange);
@@ -53,22 +84,68 @@ export function ShopProvider({ children }) {
   }, [categories]);
 
   const setActiveCategory = (catId) => {
-    setActiveCategoryState(catId);
-    if (catId === 'all') {
+    if (catId === 'home') {
+      setIsCatalogView(false);
+      setActiveCategoryState('all');
       window.location.hash = 'home';
+    } else if (catId === 'all' || catId === 'catalog') {
+      setIsCatalogView(true);
+      setActiveCategoryState('all');
+      window.location.hash = 'catalog';
     } else {
+      setIsCatalogView(true);
+      setActiveCategoryState(catId);
       window.location.hash = catId;
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const navigateToHome = () => {
+    setIsCatalogView(false);
+    setActiveCategoryState('all');
+    window.location.hash = 'home';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   useEffect(() => {
     localStorage.setItem('smh_cart', JSON.stringify(cart));
+    const timer = setTimeout(() => {
+      const sessionToken = getSessionToken();
+      const items = cart.map(i => ({
+        product_id: typeof i.dbId === 'number' ? i.dbId : (typeof i.id === 'number' ? i.id : 1),
+        product_name: i.name,
+        sku: i.sku || '',
+        quantity: i.quantity,
+        unit_price: Number(i.price) || 0
+      }));
+      businessApi.syncStorefrontCart({
+        session_token: sessionToken,
+        items
+      }).catch(() => {
+        // silent telemetry fallback
+      });
+    }, 800);
+    return () => clearTimeout(timer);
   }, [cart]);
 
   useEffect(() => {
     localStorage.setItem('smh_wishlist', JSON.stringify(wishlist));
-  }, [wishlist]);
+    const timer = setTimeout(() => {
+      const sessionToken = getSessionToken();
+      const numericIds = wishlist.map(id => {
+        if (typeof id === 'number') return id;
+        const found = products.find(p => p.id === id);
+        return found?.dbId || 1;
+      });
+      businessApi.syncStorefrontWishlist({
+        session_token: sessionToken,
+        product_ids: numericIds
+      }).catch(() => {
+        // silent telemetry fallback
+      });
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [wishlist, products]);
 
   const addToast = (message, icon = 'check-circle') => {
     const id = Date.now();
@@ -140,6 +217,9 @@ export function ShopProvider({ children }) {
       wishlist,
       activeCategory,
       setActiveCategory,
+      isCatalogView,
+      setIsCatalogView,
+      navigateToHome,
       searchQuery,
       setSearchQuery,
       isCartOpen,
@@ -159,7 +239,12 @@ export function ShopProvider({ children }) {
       decrementQty,
       removeFromCart,
       toggleWishlist,
-      addToast
+      addToast,
+      siteContent,
+      siteContentLoading,
+      isSiteContentLive,
+      refetchSiteContent,
+      updateSiteContent
     }}>
       {children}
     </ShopContext.Provider>

@@ -2,23 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Truck, ShieldCheck, Award, Headphones, MapPin, Package, HelpCircle, 
   Search, Heart, User, ShoppingCart, Menu, Grid, DoorOpen, Grab, 
-  Lock, Sliders, Box, Droplet, Sparkles, ArrowRight, ChevronDown, Check 
+  Lock, Sliders, Box, Droplet, Wrench, Sparkles, ArrowRight, ChevronDown, Check 
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 
-const CATEGORY_OPTIONS = [
-  { id: 'all', label: 'All Categories' },
-  { id: 'door-hardware', label: 'Door Hardware' },
-  { id: 'handles', label: 'Handles' },
-  { id: 'locks-security', label: 'Locks & Security' },
-  { id: 'hinges', label: 'Hinges' },
-  { id: 'cabinet-hardware', label: 'Cabinet Hardware' },
-  { id: 'bathroom-fittings', label: 'Bathroom Fittings' },
-  { id: 'tools-accessories', label: 'Tools & Accessories' },
-];
-
 export function Header({ setViewMode, viewMode }) {
-  const { cart, wishlist, setIsCartOpen, setIsMobileNavOpen, cartBump, activeCategory, setActiveCategory, setSearchQuery } = useShop();
+  const { cart, wishlist, setIsCartOpen, setIsMobileNavOpen, cartBump, activeCategory, setActiveCategory, navigateToHome, setSearchQuery, categories, siteContent } = useShop();
+  const footerData = siteContent?.footer || {};
   const [isSticky, setIsSticky] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [isSearchActive, setIsSearchActive] = useState(false);
@@ -32,7 +22,20 @@ export function Header({ setViewMode, viewMode }) {
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const wishlistCount = wishlist.length;
 
-  const currentCatOption = CATEGORY_OPTIONS.find(c => c.id === activeCategory) || CATEGORY_OPTIONS[0];
+  const categoryOptions = [
+    { id: 'all', label: 'All Categories' },
+    ...((categories && categories.length > 0) ? categories.map(c => ({ id: c.id, label: c.name })) : [
+      { id: 'door-hardware', label: 'Door Hardware' },
+      { id: 'handles', label: 'Handles' },
+      { id: 'locks-security', label: 'Locks & Security' },
+      { id: 'hinges', label: 'Hinges' },
+      { id: 'cabinet-hardware', label: 'Cabinet Hardware' },
+      { id: 'bathroom-fittings', label: 'Bathroom Fittings' },
+      { id: 'tools-accessories', label: 'Tools & Accessories' },
+    ])
+  ];
+
+  const currentCatOption = categoryOptions.find(c => c.id === activeCategory) || categoryOptions[0];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -76,13 +79,13 @@ export function Header({ setViewMode, viewMode }) {
       <div className="top-utility-bar">
         <div className="container utility-container">
           <div className="utility-left">
-            <span className="utility-item"><Truck size={14} /> Fast & Reliable Delivery</span>
+            <span className="utility-item"><Truck size={14} /> {footerData.top_bar_message_1 || 'Fast & Reliable Delivery'}</span>
             <span className="utility-divider"></span>
-            <span className="utility-item"><ShieldCheck size={14} /> Genuine Quality Products</span>
+            <span className="utility-item"><ShieldCheck size={14} /> {footerData.top_bar_message_2 || 'Genuine Quality Products'}</span>
             <span className="utility-divider"></span>
-            <span className="utility-item"><Award size={14} /> Trusted Hardware Professionals</span>
+            <span className="utility-item"><Award size={14} /> {footerData.top_bar_message_3 || 'Trusted Hardware Professionals'}</span>
             <span className="utility-divider"></span>
-            <span className="utility-item"><Headphones size={14} /> Expert Support</span>
+            <span className="utility-item"><Headphones size={14} /> {footerData.top_bar_message_4 || 'Expert Support'}</span>
           </div>
           <div className="utility-right">
             {setViewMode && (
@@ -125,7 +128,16 @@ export function Header({ setViewMode, viewMode }) {
           </button>
 
           {/* Logo: SHREE MAHALAXMI HARDWARE */}
-          <a href="#home" className="brand-logo" onClick={() => setActiveCategory('all')} title="Shree Mahalaxmi Hardware">
+          <a 
+            href="#home" 
+            className="brand-logo" 
+            onClick={(e) => { 
+              e.preventDefault(); 
+              if (navigateToHome) navigateToHome(); 
+              else setActiveCategory('home'); 
+            }} 
+            title="Shree Mahalaxmi Hardware"
+          >
             <div className="logo-emblem">
               <ShieldCheck size={24} />
             </div>
@@ -154,7 +166,7 @@ export function Header({ setViewMode, viewMode }) {
 
                 {isCatDropdownOpen && (
                   <div className="custom-dropdown-menu">
-                    {CATEGORY_OPTIONS.map(opt => (
+                    {categoryOptions.map(opt => (
                       <button
                         key={opt.id}
                         type="button"
@@ -247,46 +259,53 @@ export function Header({ setViewMode, viewMode }) {
 
               <div className="mega-menu-dropdown">
                 <div className="mega-menu-grid">
-                  <a href="#door-hardware" className="mega-menu-item" onClick={() => { setActiveCategory('door-hardware'); setIsMegaMenuOpen(false); }}>
+                  <a href="#door-hardware" className="mega-menu-item" onClick={(e) => { e.preventDefault(); setActiveCategory('door-hardware'); setIsMegaMenuOpen(false); }}>
                     <div className="mega-menu-icon"><DoorOpen size={20} /></div>
                     <div>
                       <div className="mega-menu-info-title">Door Hardware</div>
                       <div className="mega-menu-info-desc">Handles, lever locks, tower bolts</div>
                     </div>
                   </a>
-                  <a href="#handles" className="mega-menu-item" onClick={() => { setActiveCategory('handles'); setIsMegaMenuOpen(false); }}>
+                  <a href="#handles" className="mega-menu-item" onClick={(e) => { e.preventDefault(); setActiveCategory('handles'); setIsMegaMenuOpen(false); }}>
                     <div className="mega-menu-icon"><Grab size={20} /></div>
                     <div>
                       <div className="mega-menu-info-title">Handles</div>
                       <div className="mega-menu-info-desc">Mortise, pull bars, rose handles</div>
                     </div>
                   </a>
-                  <a href="#locks-security" className="mega-menu-item" onClick={() => { setActiveCategory('locks-security'); setIsMegaMenuOpen(false); }}>
+                  <a href="#locks-security" className="mega-menu-item" onClick={(e) => { e.preventDefault(); setActiveCategory('locks-security'); setIsMegaMenuOpen(false); }}>
                     <div className="mega-menu-icon"><Lock size={20} /></div>
                     <div>
                       <div className="mega-menu-info-title">Locks & Security</div>
                       <div className="mega-menu-info-desc">Biometric smart locks, deadbolts</div>
                     </div>
                   </a>
-                  <a href="#hinges" className="mega-menu-item" onClick={() => { setActiveCategory('hinges'); setIsMegaMenuOpen(false); }}>
+                  <a href="#hinges" className="mega-menu-item" onClick={(e) => { e.preventDefault(); setActiveCategory('hinges'); setIsMegaMenuOpen(false); }}>
                     <div className="mega-menu-icon"><Sliders size={20} /></div>
                     <div>
                       <div className="mega-menu-info-title">Hinges</div>
                       <div className="mega-menu-info-desc">Hydraulic soft-close, SS 304 butt hinges</div>
                     </div>
                   </a>
-                  <a href="#cabinet-hardware" className="mega-menu-item" onClick={() => { setActiveCategory('cabinet-hardware'); setIsMegaMenuOpen(false); }}>
+                  <a href="#cabinet-hardware" className="mega-menu-item" onClick={(e) => { e.preventDefault(); setActiveCategory('cabinet-hardware'); setIsMegaMenuOpen(false); }}>
                     <div className="mega-menu-icon"><Box size={20} /></div>
                     <div>
                       <div className="mega-menu-info-title">Cabinet Hardware</div>
                       <div className="mega-menu-info-desc">Drawer slides, knobs, profile handles</div>
                     </div>
                   </a>
-                  <a href="#bathroom-fittings" className="mega-menu-item" onClick={() => { setActiveCategory('bathroom-fittings'); setIsMegaMenuOpen(false); }}>
+                  <a href="#bathroom-fittings" className="mega-menu-item" onClick={(e) => { e.preventDefault(); setActiveCategory('bathroom-fittings'); setIsMegaMenuOpen(false); }}>
                     <div className="mega-menu-icon"><Droplet size={20} /></div>
                     <div>
                       <div className="mega-menu-info-title">Bathroom Fittings</div>
                       <div className="mega-menu-info-desc">Faucets, glass patches, towel rails</div>
+                    </div>
+                  </a>
+                  <a href="#tools-accessories" className="mega-menu-item" onClick={(e) => { e.preventDefault(); setActiveCategory('tools-accessories'); setIsMegaMenuOpen(false); }}>
+                    <div className="mega-menu-icon"><Wrench size={20} /></div>
+                    <div>
+                      <div className="mega-menu-info-title">Tools & Accessories</div>
+                      <div className="mega-menu-info-desc">Fasteners, drill kits, adhesives & tools</div>
                     </div>
                   </a>
                 </div>

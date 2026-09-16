@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, Home, LogOut, Menu, Package, Plus, Receipt, Sparkles, Users, Wallet, X } from 'lucide-react';
+import { BarChart3, Home, LogOut, Menu, Package, Plus, Receipt, Sparkles, Users, Wallet, X, Layers, LayoutTemplate, ShoppingCart } from 'lucide-react';
 
 const TAB_TITLES = {
   kpis: 'Executive Overview & Operations',
   billing: 'Point of Sale (POS) & Invoicing',
+  catalog: 'Storefront Catalog & Showcase Curator',
+  cms: 'Storefront CMS Visual Editor',
+  engagement: 'Live Store Carts & Audience Telemetry',
   customers: 'Customer & Contractor Directory',
   inventory: 'Live Inventory & Stock Health',
   khata: 'Digital Customer Khata Ledger',
@@ -35,6 +38,9 @@ export function AdminPanelShell({
   const navItems = [
     { id: 'kpis', label: 'Executive Overview', icon: BarChart3 },
     { id: 'billing', label: 'Point of Sale (POS)', icon: Receipt },
+    { id: 'catalog', label: 'Catalog & Showcase', icon: Layers },
+    { id: 'cms', label: 'Storefront CMS', icon: LayoutTemplate },
+    { id: 'engagement', label: 'Live Store Carts', icon: ShoppingCart },
     { id: 'customers', label: 'Customers & Builders', icon: Users },
     { id: 'inventory', label: 'Inventory & Stock', icon: Package, badge: badgeCounts?.lowStock, badgeType: 'danger' },
     { id: 'khata', label: 'Digital Khata Ledger', icon: Wallet },

@@ -20,6 +20,9 @@ import {
 } from 'lucide-react';
 import { businessApi } from '../api/businessApi';
 import { formatINR } from '../utils/currency';
+import { CatalogShowcaseManager } from './admin/CatalogShowcaseManager';
+import { StorefrontCMSManager } from './admin/StorefrontCMSManager';
+import { AudienceEngagementManager } from './admin/AudienceEngagementManager';
 
 export function AdminDashboard({
   token: propToken,
@@ -34,6 +37,24 @@ export function AdminDashboard({
   const handleTabSwitch = (tabId) => {
     setLocalActiveTab(tabId);
     if (onTabChange) onTabChange(tabId);
+  };
+
+  const handleConvertCartToPos = (cartSession) => {
+    const convertedItems = (cartSession.items || []).map(item => {
+      const existingProduct = products.find(p => p.id === item.product_id || p.sku === item.sku);
+      return {
+        product_id: item.product_id || existingProduct?.id || 1,
+        product_name: item.product_name || existingProduct?.name || 'Hardware Item',
+        sku: item.sku || existingProduct?.sku || '',
+        quantity: Number(item.quantity) || 1,
+        unit_price: Number(item.unit_price) || Number(existingProduct?.selling_price) || 0,
+        tax_rate: Number(existingProduct?.tax_rate) || 18,
+        stock_available: existingProduct?.stock_quantity ?? 20
+      };
+    });
+    setBillItems(convertedItems);
+    handleTabSwitch('billing');
+    setMsg({ type: 'success', text: `Loaded ${convertedItems.length} items from online customer cart into POS Bill!` });
   };
 
   const [dashboardData, setDashboardData] = useState(null);
@@ -1447,6 +1468,36 @@ export function AdminDashboard({
             </div>
           )}
         </div>
+      )}
+
+      {/* =========================================================================
+          TAB 7: CATALOG & SHOWCASE CURATOR (catalog)
+          ========================================================================= */}
+      {currentTab === 'catalog' && (
+        <CatalogShowcaseManager
+          token={token}
+          onCatalogUpdated={() => loadDashboardData(token)}
+        />
+      )}
+
+      {/* =========================================================================
+          TAB 8: STOREFRONT CMS VISUAL EDITOR (cms)
+          ========================================================================= */}
+      {currentTab === 'cms' && (
+        <StorefrontCMSManager
+          token={token}
+          onContentSaved={() => loadDashboardData(token)}
+        />
+      )}
+
+      {/* =========================================================================
+          TAB 9: AUDIENCE TELEMETRY & LIVE CARTS (engagement)
+          ========================================================================= */}
+      {currentTab === 'engagement' && (
+        <AudienceEngagementManager
+          token={token}
+          onConvertToPos={handleConvertCartToPos}
+        />
       )}
 
       {/* =========================================================================

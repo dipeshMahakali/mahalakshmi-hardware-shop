@@ -23,9 +23,9 @@ import { PartnerPanelShell } from './components/layout/PartnerPanelShell.jsx';
 import './style.css';
 
 function MainCatalogContent() {
-  const { activeCategory } = useShop();
+  const { activeCategory, isCatalogView } = useShop();
 
-  if (activeCategory !== 'all') {
+  if (isCatalogView || (activeCategory !== 'all' && activeCategory !== 'home')) {
     return <CategoryCatalog />;
   }
 
@@ -54,7 +54,7 @@ export default function App() {
   const [showDemoBar, setShowDemoBar] = useState(false);
   const [adminTab, setAdminTab] = useState(() => {
     const hash = window.location.hash.replace('#', '');
-    return ['kpis', 'billing', 'customers', 'inventory', 'khata', 'ai'].includes(hash) ? hash : 'kpis';
+    return ['kpis', 'billing', 'customers', 'inventory', 'khata', 'ai', 'catalog', 'cms', 'engagement'].includes(hash) ? hash : 'kpis';
   });
   const [adminBadges, setAdminBadges] = useState({ aiJobs: 0, lowStock: 0 });
   const [partnerTab, setPartnerTab] = useState(() => {
@@ -76,7 +76,7 @@ export default function App() {
   useEffect(() => {
     const onHashChange = () => {
       const rawHash = window.location.hash.replace('#', '');
-      if (['kpis', 'billing', 'customers', 'inventory', 'khata', 'ai'].includes(rawHash)) {
+      if (['kpis', 'billing', 'customers', 'inventory', 'khata', 'ai', 'catalog', 'cms', 'engagement'].includes(rawHash)) {
         setAdminTab(rawHash);
       }
       if (['order', 'photo', 'sites', 'khata', 'orders'].includes(rawHash)) {

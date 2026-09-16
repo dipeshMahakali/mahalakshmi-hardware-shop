@@ -6,7 +6,12 @@ import { useShop } from '../context/ShopContext.jsx';
 import { useRotaryCarousel } from '../hooks/useRotaryCarousel.js';
 
 export function Categories() {
-  const { setActiveCategory } = useShop();
+  const { setActiveCategory, categories: liveCategories, siteContent } = useShop();
+  const catHeader = siteContent?.categories_header || {};
+
+  const baseCategories = Array.isArray(liveCategories) && liveCategories.length > 0
+    ? liveCategories
+    : CATEGORIES;
 
   const {
     trackRef,
@@ -20,13 +25,13 @@ export function Categories() {
     handleKeyDown,
     containerProps
   } = useRotaryCarousel({
-    itemsLength: CATEGORIES.length,
+    itemsLength: baseCategories.length,
     basePixelsPerSecond: 80,
     stepDistance: 230
   });
 
   // Tripled dataset to create an unbreakable, seamless 360° rotating disk loop
-  const displayCategories = [...CATEGORIES, ...CATEGORIES, ...CATEGORIES];
+  const displayCategories = [...baseCategories, ...baseCategories, ...baseCategories];
 
   const getCategorySvgType = (cat) => {
     switch (cat.id) {
@@ -47,11 +52,11 @@ export function Categories() {
         <div className="section-header">
           <div className="section-title-group">
             <span className="section-badge">
-              <Layers size={14} /> 360° Category Showcase
+              <Layers size={14} /> {catHeader.badge || '360° Category Showcase'}
             </span>
-            <h2 className="section-title">Explore Top Categories</h2>
+            <h2 className="section-title">{catHeader.title || 'Explore Top Categories'}</h2>
             <p className="section-subtitle">
-              Precision engineered architectural hardware for every residential and commercial space.
+              {catHeader.subtitle || 'Precision engineered architectural hardware for every residential and commercial space.'}
             </p>
           </div>
 
@@ -164,7 +169,7 @@ export function Categories() {
           </div>
 
           <div className="carousel-hint-text">
-            <span>Drag or use arrows to spin ({CATEGORIES.length} categories)</span>
+            <span>Drag or use arrows to spin ({baseCategories.length} categories)</span>
           </div>
         </div>
       </div>

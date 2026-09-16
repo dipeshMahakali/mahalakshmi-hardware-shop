@@ -7,12 +7,15 @@ import { useShop } from '../context/ShopContext.jsx';
 import { useRotaryCarousel } from '../hooks/useRotaryCarousel.js';
 
 export function RecommendedProducts() {
-  const { setActiveCategory } = useShop();
-  const { products } = useProducts();
+  const { setActiveCategory, products, siteContent } = useShop();
+  const headerData = siteContent?.recommended_header || {};
 
-  // Curate 8 distinctive recommended items from catalog
-  const catalogSource = products && products.length >= 10 ? products : PRODUCTS;
-  const recommended = catalogSource.slice(6, 14);
+  // Curate recommended items dynamically flagged from catalog
+  const catalogSource = products && products.length > 0 ? products : PRODUCTS;
+  const filteredRecommended = catalogSource.filter(p => p.is_recommended);
+  const recommended = filteredRecommended.length >= 4 
+    ? filteredRecommended 
+    : (catalogSource.length >= 10 ? catalogSource.slice(6, 14) : catalogSource.slice(0, 8));
 
   // Tripled dataset to create an unbreakable, seamless 360° rotating disk loop
   const displayItems = [...recommended, ...recommended, ...recommended];
@@ -40,11 +43,11 @@ export function RecommendedProducts() {
         <div className="section-header">
           <div className="section-title-group">
             <span className="section-badge">
-              <Sparkles size={14} /> 360° Curated Rotation
+              <Sparkles size={14} /> {headerData.badge || '360° Curated Rotation'}
             </span>
-            <h2 className="section-title">Recommended Hardware</h2>
+            <h2 className="section-title">{headerData.title || 'Recommended Hardware'}</h2>
             <p className="section-subtitle">
-              Continuous showcase of high-precision architectural fittings chosen by interior architects and master craftsmen.
+              {headerData.subtitle || 'Continuous showcase of high-precision architectural fittings chosen by interior architects and master craftsmen.'}
             </p>
           </div>
 

@@ -6,10 +6,21 @@ import {
 import { useShop } from '../context/ShopContext';
 
 export function Footer() {
-  const { cart, wishlist, setIsCartOpen, setIsMobileNavOpen, setActiveCategory } = useShop();
+  const { cart, wishlist, setIsCartOpen, setIsMobileNavOpen, setActiveCategory, categories, siteContent } = useShop();
+  const footerData = siteContent?.footer || {};
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const wishlistCount = wishlist.length;
+
+  const displayCategories = (categories && categories.length > 0)
+    ? categories.slice(0, 6)
+    : [
+        { id: 'door-hardware', name: 'Door Hardware' },
+        { id: 'handles', name: 'Handles' },
+        { id: 'locks-security', name: 'Locks & Security' },
+        { id: 'hinges', name: 'Hinges' },
+        { id: 'cabinet-hardware', name: 'Cabinet Hardware' }
+      ];
 
   return (
     <>
@@ -31,23 +42,28 @@ export function Footer() {
               </a>
               
               <p className="footer-about-text">
-                Your trusted destination for premium architectural hardware, fittings, door security, and cabinet accessories. Built for durability and engineered for modern spaces.
+                {footerData.about_text || 'Your trusted destination for premium architectural hardware, fittings, door security, and cabinet accessories. Built for durability and engineered for modern spaces.'}
               </p>
 
               <div className="footer-trust-badges">
                 <div className="footer-badge-pill"><ShieldCheck size={14} /> 100% Genuine</div>
                 <div className="footer-badge-pill"><Lock size={14} /> 256-Bit SSL</div>
+                {footerData.gstin && (
+                  <div className="footer-badge-pill">GSTIN: {footerData.gstin}</div>
+                )}
               </div>
             </div>
 
             <div>
               <h4 className="footer-col-title">Shop Catalogs</h4>
               <ul className="footer-links-list">
-                <li><button className="footer-link-btn" onClick={() => setActiveCategory('door-hardware')}>Door Hardware</button></li>
-                <li><button className="footer-link-btn" onClick={() => setActiveCategory('handles')}>Handles</button></li>
-                <li><button className="footer-link-btn" onClick={() => setActiveCategory('locks-security')}>Locks & Security</button></li>
-                <li><button className="footer-link-btn" onClick={() => setActiveCategory('hinges')}>Hinges</button></li>
-                <li><button className="footer-link-btn" onClick={() => setActiveCategory('cabinet-hardware')}>Cabinet Hardware</button></li>
+                {displayCategories.map(cat => (
+                  <li key={cat.id}>
+                    <button className="footer-link-btn" onClick={() => setActiveCategory(cat.id)}>
+                      {cat.name}
+                    </button>
+                  </li>
+                ))}
                 <li><button className="footer-link-btn" onClick={() => setActiveCategory('all')}>All Catalogs</button></li>
               </ul>
             </div>
@@ -80,26 +96,26 @@ export function Footer() {
               <div className="footer-contact-list">
                 <div className="footer-contact-item">
                   <Phone size={18} />
-                  <span>+91 98765 43210</span>
+                  <span>{footerData.phone || '+91 98765 43210'}</span>
                 </div>
                 <div className="footer-contact-item">
                   <Mail size={18} />
-                  <span>info@shreemahalaxmihardware.com</span>
+                  <span>{footerData.email || 'info@shreemahalaxmihardware.com'}</span>
                 </div>
                 <div className="footer-contact-item">
                   <MapPin size={18} />
-                  <span>123 Hardware Market, City Center, Ahmedabad, Gujarat - 380001</span>
+                  <span>{footerData.address || '123 Hardware Market, City Center, Ahmedabad, Gujarat - 380001'}</span>
                 </div>
                 <div className="footer-contact-item">
                   <Clock size={18} />
-                  <span>Mon - Sat: 9:00 AM - 7:00 PM</span>
+                  <span>{footerData.hours || 'Mon - Sat: 9:00 AM - 7:00 PM'}</span>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="footer-bottom-bar">
-            <div>© {new Date().getFullYear()} Shree Mahalaxmi Hardware. All Rights Reserved.</div>
+            <div>{footerData.copyright || `© ${new Date().getFullYear()} Shree Mahalaxmi Hardware. All Rights Reserved.`}</div>
 
             <div className="payment-badges-row">
               <span className="payment-badge">VISA</span>

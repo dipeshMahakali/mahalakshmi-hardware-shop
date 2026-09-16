@@ -9,12 +9,15 @@ import { useRotaryCarousel } from '../hooks/useRotaryCarousel.js';
 export { RecommendedProducts } from './RecommendedProducts.jsx';
 
 export function BestSellers() {
-  const { setActiveCategory } = useShop();
-  const { products } = useProducts();
+  const { setActiveCategory, products, siteContent } = useShop();
+  const headerData = siteContent?.bestsellers_header || {};
 
-  // Curate top bestsellers from catalog source
-  const catalogSource = products && products.length >= 8 ? products : PRODUCTS;
-  const bestSellers = catalogSource.slice(0, 8);
+  // Curate top bestsellers dynamically flagged from catalog
+  const catalogSource = products && products.length > 0 ? products : PRODUCTS;
+  const filteredBestsellers = catalogSource.filter(p => p.is_bestseller);
+  const bestSellers = filteredBestsellers.length >= 4 
+    ? filteredBestsellers 
+    : catalogSource.slice(0, 8);
 
   const {
     trackRef,
@@ -42,11 +45,11 @@ export function BestSellers() {
         <div className="section-header">
           <div className="section-title-group">
             <span className="section-badge">
-              <Flame size={14} /> Customer Favorites
+              <Flame size={14} /> {headerData.badge || 'Customer Favorites'}
             </span>
-            <h2 className="section-title">Most Loved Hardware Essentials</h2>
+            <h2 className="section-title">{headerData.title || 'Most Loved Hardware Essentials'}</h2>
             <p className="section-subtitle">
-              Popular architectural hardware selected by homeowners and design professionals.
+              {headerData.subtitle || 'Popular architectural hardware selected by homeowners and design professionals.'}
             </p>
           </div>
 
