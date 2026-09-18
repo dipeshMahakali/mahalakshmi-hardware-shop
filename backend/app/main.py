@@ -11,6 +11,11 @@ from app.core.database import Base, engine
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     Base.metadata.create_all(bind=engine)
+    try:
+        from app.seed import seed_data
+        seed_data(drop_existing=False)
+    except Exception as exc:
+        print(f"Database auto-seed notice: {exc}")
     yield
 
 

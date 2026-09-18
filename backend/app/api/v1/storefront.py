@@ -283,3 +283,27 @@ def get_engagement_overview(
         top_wishlisted_products=top_wishlisted_products
     )
 
+
+@router.api_route("/seed", methods=["GET", "POST"])
+def seed_storefront_database(force: bool = False, key: str = "", db: Session = Depends(get_db)):
+    from app.models import ProductCategory
+    from app.seed import seed_data
+    count = db.scalar(select(func.count()).select_from(ProductCategory)) or 0
+    if count > 0 and not force:
+        return {
+            "success": True,
+            "message": f"Database already initialized ({count} categories found). To re-seed, pass ?force=true&key=admin123",
+            "categories_count": count
+        }
+    if force and key != "admin123":
+        raise HTTPException(status_code=403, detail="Invalid admin key for force reset")
+
+    seed_data(drop_existing=bool(force))
+    return {
+        "success": True,
+        "message": "Database successfully seeded with categories, products, owner login, and CMS showroom content!",
+        "admin_login": "owner@hardware.com / admin123",
+        "partner_login": "ramesh@carpenter.com / carpenter123"
+    }
+
+

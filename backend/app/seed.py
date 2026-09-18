@@ -1,6 +1,7 @@
 import json
 from decimal import Decimal
 
+from sqlalchemy import func, select
 from app.core.database import Base, SessionLocal, engine
 from app.core.security import hash_password
 from app.models import (
@@ -16,6 +17,12 @@ def seed_data(drop_existing: bool = True):
 
     db = SessionLocal()
     try:
+        if not drop_existing:
+            existing_count = db.scalar(select(func.count()).select_from(ProductCategory))
+            if existing_count and existing_count > 0:
+                print(f"Database already contains {existing_count} categories. Skipping seed.")
+                return
+
         # Create Users
         owner = User(name="Mahalakshmi Owner", email="owner@hardware.com", password_hash=hash_password("admin123"), role="OWNER")
         carpenter_user = User(name="Ramesh Carpenter", email="ramesh@carpenter.com", phone="9876543210", password_hash=hash_password("carpenter123"), role="CARPENTER")
