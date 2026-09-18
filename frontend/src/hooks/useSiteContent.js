@@ -102,27 +102,27 @@ export const DEFAULT_SITE_CONTENT = {
   ],
   why_choose_us: {
     badge: 'Our Commitment',
-    title: 'Why Choose Shree Mahalaxmi Hardware?',
-    subtitle: 'Delivering exceptional quality, technical precision, and reliable customer service.',
+    title: 'Why Choose Shri Mahalakshmi Trader?',
+    subtitle: 'Delivering exceptional quality, technical precision, and reliable customer service in Bagbahara & surrounding regions.',
     items: [
       { id: 'why-1', icon: 'shield-check', title: 'Quality First', desc: 'Carefully selected hardware products manufactured to rigorous EN & IS standards.' },
       { id: 'why-2', icon: 'clock', title: 'Reliable Service', desc: 'Prompt order processing, dedicated logistics, and dependable project deliveries.' },
-      { id: 'why-3', icon: 'grid', title: 'Broad Selection', desc: 'Over 500+ premium architectural fittings, drawer systems, and commercial hardware.' },
+      { id: 'why-3', icon: 'grid', title: 'Broad Selection', desc: 'Over 5,000+ premium architectural fittings, drawer systems, and commercial hardware.' },
       { id: 'why-4', icon: 'trending-up', title: 'Trade Benefits', desc: 'Exclusive wholesale pricing and digital khata management for architects & contractors.' }
     ]
   },
   footer: {
-    about_text: 'Your trusted destination for premium architectural hardware, fittings, door security, and cabinet accessories. Built for durability and engineered for modern spaces.',
-    phone: '+91 98765 43210',
-    email: 'info@shreemahalaxmihardware.com',
-    address: '123 Hardware Market, City Center, Ahmedabad, Gujarat - 380001',
-    hours: 'Mon - Sat: 9:00 AM - 7:00 PM',
-    gstin: '24AAACH7409R1ZZ',
-    copyright: '© 2026 Shree Mahalaxmi Hardware. All rights reserved.',
-    top_bar_message_1: 'Fast & Reliable Delivery',
-    top_bar_message_2: 'Genuine Quality Products',
+    about_text: 'Shri Mahalakshmi Trader is your trusted destination for premium architectural hardware, fittings, door security, and cabinet accessories in Bagbahara. Built for durability and engineered for modern spaces.',
+    phone: '+91 95261 62225',
+    email: 'contact@shrimahalakshmitrader.com',
+    address: 'Near Bharat Petrol Pump, Bagbahara, Chhattisgarh - 493449',
+    hours: 'Mon - Sat: 9:00 AM - 8:00 PM',
+    gstin: '22AAACH7409R1ZZ',
+    copyright: '© 2026 Shri Mahalakshmi Trader. All rights reserved.',
+    top_bar_message_1: 'Fast & Reliable Delivery in Bagbahara',
+    top_bar_message_2: '100% Genuine Quality Hardware',
     top_bar_message_3: 'Trusted Hardware Professionals',
-    top_bar_message_4: 'Expert Support'
+    top_bar_message_4: 'Expert Support: +91 95261 62225'
   }
 };
 

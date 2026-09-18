@@ -32,7 +32,7 @@ export function WhyChooseUs() {
         <div className="section-header">
           <div className="section-title-group">
             <span className="section-badge"><ShieldCheck size={14} /> {whyData.badge || 'Our Commitment'}</span>
-            <h2 className="section-title">{whyData.title || 'Why Choose Shree Mahalaxmi Hardware?'}</h2>
+            <h2 className="section-title">{whyData.title || 'Why Choose Shri Mahalakshmi Trader?'}</h2>
             <p className="section-subtitle">{whyData.subtitle || 'Delivering exceptional quality, technical precision, and reliable customer service.'}</p>
           </div>
         </div>

@@ -32,7 +32,7 @@ export function QuoteModal() {
           <div className="form-row">
             <div className="form-group">
               <label className="form-label" htmlFor="quote-phone">Phone Number</label>
-              <input id="quote-phone" className="form-input" type="tel" placeholder="+91 98765 43210" required />
+              <input id="quote-phone" className="form-input" type="tel" placeholder="+91 95261 62225" required />
             </div>
             <div className="form-group">
               <label className="form-label" htmlFor="quote-type">Project Type</label>

@@ -115,8 +115,8 @@ export function PartnerLogin({ onLoginSuccess, onCancel }) {
   };
 
   const whatsappHelpUrl = buildWhatsAppLink(
-    '919876543210',
-    'Namaste Shree Mahalaxmi Hardware! I need assistance signing into the Carpenter Partner Portal.'
+    '919526162225',
+    'Namaste Shri Mahalakshmi Trader! I need assistance signing into the Carpenter Partner Portal.'
   );
 
   return (
@@ -759,12 +759,12 @@ export function PartnerLogin({ onLoginSuccess, onCancel }) {
             </div>
 
             <p style={{ fontSize: '0.875rem', color: 'var(--color-text-inverse-muted)', lineHeight: '1.5', margin: '0 0 1.25rem 0' }}>
-              Your partner account is managed directly by Shree Mahalaxmi Hardware. If you forgot your login PIN or registered phone number, you can get it reset in 2 minutes via WhatsApp or by visiting the shop counter.
+              Your partner account is managed directly by Shri Mahalakshmi Trader. If you forgot your login PIN or registered phone number, you can get it reset in 2 minutes via WhatsApp or by visiting the shop counter near Bharat Petrol Pump, Bagbahara.
             </p>
 
             <div style={{ display: 'flex', gap: '10px' }}>
               <a
-                href={buildWhatsAppLink('919876543210', 'Namaste Shree Mahalaxmi Hardware! I forgot my carpenter partner portal PIN and need help resetting it.')}
+                href={buildWhatsAppLink('919526162225', 'Namaste Shri Mahalakshmi Trader! I forgot my carpenter partner portal PIN and need help resetting it.')}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{

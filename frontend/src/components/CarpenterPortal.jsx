@@ -237,8 +237,8 @@ export function CarpenterPortal({
   };
 
   const sendWhatsAppVoiceOrder = () => {
-    const text = `Namaste Shree Mahalaxmi Hardware! 👋\n\nI am sending a site material order from ${carpenter?.name || 'Ramesh Carpenter'}:\n"${voiceText}"\n\nPlease confirm price and availability.`;
-    const link = buildWhatsAppLink('919876543210', text);
+    const text = `Namaste Shri Mahalakshmi Trader! 👋\n\nI am sending a site material order from ${carpenter?.name || 'Ramesh Carpenter'}:\n"${voiceText}"\n\nPlease confirm price and availability.`;
+    const link = buildWhatsAppLink('919526162225', text);
     window.open(link, '_blank');
   };
 
@@ -267,13 +267,13 @@ export function CarpenterPortal({
       >
         <div>
           <span className="panel-eyebrow" style={{ color: '#F47B20' }}>
-            SHREE MAHALAXMI PARTNER NETWORK &bull; VERIFIED CONTRACTOR
+            SHRI MAHALAKSHMI PARTNER NETWORK &bull; VERIFIED CONTRACTOR
           </span>
           <h2 style={{ margin: '2px 0 0 0', fontSize: '22px', fontWeight: 800, color: '#FFFFFF' }}>
             👋 {carpenter?.name || 'Ramesh Carpenter'}
           </h2>
           <span style={{ fontSize: '13px', color: '#94A3B8' }}>
-            Primary Phone: {carpenter?.phone || '+91 98765 43210'} &bull; Category: {carpenter?.customer_type || 'CARPENTER'}
+            Primary Phone: {carpenter?.phone || '+91 95261 62225'} &bull; Category: {carpenter?.customer_type || 'CARPENTER'}
           </span>
         </div>
 
@@ -855,7 +855,7 @@ export function CarpenterPortal({
             <div className="admin-card-header" style={{ marginBottom: '16px' }}>
               <h3 className="admin-card-title">
                 <QrCode size={18} style={{ color: '#10B981' }} />
-                <span>Pay Shree Mahalaxmi Hardware via UPI</span>
+                <span>Pay Shri Mahalakshmi Trader via UPI</span>
               </h3>
               <button
                 type="button"

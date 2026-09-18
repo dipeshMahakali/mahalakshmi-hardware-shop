@@ -25,7 +25,7 @@ export function PartnerPanelShell({
           <a className="panel-brand partner-brand" href="/" title="Back to storefront">
             <span className="panel-brand-mark partner-mark"><Hammer size={18} /></span>
             <span className="partner-brand-text">
-              <strong>Shree Mahalaxmi</strong>
+              <strong>Shri Mahalakshmi</strong>
               <small className="partner-brand-subtitle">Carpenter Network</small>
             </span>
           </a>

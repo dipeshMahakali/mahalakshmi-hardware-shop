@@ -683,7 +683,7 @@ export function StorefrontCMSManager({ token, onContentSaved }) {
         <div className="admin-card" style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '12px', padding: '1.5rem' }}>
           <h3 style={{ fontSize: '1.15rem', fontWeight: 600, color: '#f4f4f5', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Award size={18} color="#f59e0b" />
-            "Why Choose Shree Mahalaxmi Hardware" Pillars (4 Cards)
+            "Why Choose Shri Mahalakshmi Trader" Pillars (4 Cards)
           </h3>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
@@ -704,7 +704,7 @@ export function StorefrontCMSManager({ token, onContentSaved }) {
                 className="form-input"
                 value={cmsData.why_choose_us?.title || ''}
                 onChange={(e) => updateField('why_choose_us', 'title', e.target.value)}
-                placeholder="Why Choose Shree Mahalaxmi Hardware?"
+                placeholder="Why Choose Shri Mahalakshmi Trader?"
               />
             </div>
             <div>
@@ -782,7 +782,7 @@ export function StorefrontCMSManager({ token, onContentSaved }) {
                 className="form-input"
                 value={cmsData.footer?.phone || ''}
                 onChange={(e) => updateField('footer', 'phone', e.target.value)}
-                placeholder="+91 98765 43210"
+                placeholder="+91 95261 62225"
               />
             </div>
 
@@ -793,7 +793,7 @@ export function StorefrontCMSManager({ token, onContentSaved }) {
                 className="form-input"
                 value={cmsData.footer?.email || ''}
                 onChange={(e) => updateField('footer', 'email', e.target.value)}
-                placeholder="info@shreemahalaxmihardware.com"
+                placeholder="contact@shrimahalakshmitrader.com"
               />
             </div>
 
@@ -804,7 +804,7 @@ export function StorefrontCMSManager({ token, onContentSaved }) {
                 className="form-input"
                 value={cmsData.footer?.address || ''}
                 onChange={(e) => updateField('footer', 'address', e.target.value)}
-                placeholder="123 Hardware Market, Ahmedabad"
+                placeholder="Near Bharat Petrol Pump, Bagbahara, Chhattisgarh"
               />
             </div>
 
@@ -815,7 +815,7 @@ export function StorefrontCMSManager({ token, onContentSaved }) {
                 className="form-input"
                 value={cmsData.footer?.hours || ''}
                 onChange={(e) => updateField('footer', 'hours', e.target.value)}
-                placeholder="Mon - Sat: 9:00 AM - 7:00 PM"
+                placeholder="Mon - Sat: 9:00 AM - 8:00 PM"
               />
             </div>
 
@@ -826,7 +826,7 @@ export function StorefrontCMSManager({ token, onContentSaved }) {
                 className="form-input"
                 value={cmsData.footer?.gstin || ''}
                 onChange={(e) => updateField('footer', 'gstin', e.target.value)}
-                placeholder="24AAACH7409R1ZZ"
+                placeholder="22AAACH7409R1ZZ"
               />
             </div>
 
@@ -837,7 +837,7 @@ export function StorefrontCMSManager({ token, onContentSaved }) {
                 className="form-input"
                 value={cmsData.footer?.copyright || ''}
                 onChange={(e) => updateField('footer', 'copyright', e.target.value)}
-                placeholder="© 2026 Shree Mahalaxmi Hardware"
+                placeholder="© 2026 Shri Mahalakshmi Trader"
               />
             </div>
 

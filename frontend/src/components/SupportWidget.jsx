@@ -26,7 +26,7 @@ export function SupportWidget() {
         <div className="support-panel-header">How can we help you?</div>
         
         <a 
-          href={buildWhatsAppLink('919876543210', 'Hello Shree Mahalaxmi Hardware! I need assistance with product specifications.')} 
+          href={buildWhatsAppLink('919526162225', 'Hello Shri Mahalakshmi Trader! I need assistance with product specifications.')} 
           target="_blank" 
           rel="noopener noreferrer" 
           className="support-option-item"
@@ -35,7 +35,7 @@ export function SupportWidget() {
           <span>WhatsApp Expert Chat</span>
         </a>
         
-        <a href="tel:+919876543210" className="support-option-item">
+        <a href="tel:+919526162225" className="support-option-item">
           <PhoneCall size={18} style={{ color: 'var(--color-accent)' }} />
           <span>Call Hardware Specialist</span>
         </a>

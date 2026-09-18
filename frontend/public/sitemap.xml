@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- Homepage / Main Architectural Showroom — Shri Mahalakshmi Trader, Bagbahara -->
+  <url>
+    <loc>https://shrimahalakshmitrader.com/</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Door Hardware Collection -->
+  <url>
+    <loc>https://shrimahalakshmitrader.com/#door-hardware</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Biometric Smart Locks & Security -->
+  <url>
+    <loc>https://shrimahalakshmitrader.com/#locks-security</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Designer Main Door & Mortise Handles -->
+  <url>
+    <loc>https://shrimahalakshmitrader.com/#handles</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Cabinet & Wardrobe Hardware -->
+  <url>
+    <loc>https://shrimahalakshmitrader.com/#cabinet-hardware</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Hydraulic & Concealed Hinges -->
+  <url>
+    <loc>https://shrimahalakshmitrader.com/#hinges</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Luxury Bathroom Fittings -->
+  <url>
+    <loc>https://shrimahalakshmitrader.com/#bathroom-fittings</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Tools & Installation Hardware -->
+  <url>
+    <loc>https://shrimahalakshmitrader.com/#tools-accessories</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <!-- Business & Contractor Services (Bulk Quotes) -->
+  <url>
+    <loc>https://shrimahalakshmitrader.com/#services</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+</urlset>

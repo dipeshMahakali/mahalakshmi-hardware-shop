@@ -22,8 +22,8 @@ DEFAULT_SECTIONS = {
         "quality_message": "100% Genuine Quality Hardware",
         "trust_message": "Trusted by 5,000+ Architects & Builders",
         "support_message": "Expert Hardware Consultation",
-        "phone": "+91 98765 43210",
-        "whatsapp": "+91 98765 43210",
+        "phone": "+91 95261 62225",
+        "whatsapp": "+91 95261 62225",
         "announcement_text": "Special Trade Discounts for Registered Architects & Carpenters!",
         "announcement_active": True
     },
@@ -82,19 +82,24 @@ DEFAULT_SECTIONS = {
     "why_choose_us": {
         "items": [
             {"title": "Direct Showroom Pricing", "description": "Guaranteed wholesale pricing without middlemen markups.", "icon": "badge-percent"},
-            {"title": "25+ Years of Trust", "description": "Serving Gujarat & Maharashtra's master craftsmen and homeowners.", "icon": "award"},
+            {"title": "25+ Years of Trust", "description": "Serving Bagbahara & Chhattisgarh's master craftsmen, architects, and homeowners.", "icon": "award"},
             {"title": "Contractor Credit Facility", "description": "Digital Khata with flexible credit terms for verified carpenters.", "icon": "wallet"},
             {"title": "Ready Stock Availability", "description": "Over 10,000+ SKUs stocked in our central warehouse for same-day dispatch.", "icon": "package"}
         ]
     },
     "footer": {
-        "about": "Shree Mahalaxmi Hardware is your premier destination for high-precision architectural hardware, locks, designer handles, and carpenter fittings.",
-        "phone": "+91 98765 43210",
-        "email": "contact@mahalaxmihardware.com",
-        "address": "Shop No. 4-6, Laxmi Hardware Market, Ring Road, Surat, Gujarat 395002",
-        "gstin": "24ABCDE1234F1Z5",
-        "hours": "Mon - Sat: 9:00 AM - 8:30 PM (Sunday Closed)",
-        "copyright": "© 2026 Shree Mahalaxmi Hardware. All Rights Reserved. Precision Engineered."
+        "about": "Shri Mahalakshmi Trader is your premier destination for high-precision architectural hardware, locks, designer handles, and carpenter fittings in Bagbahara, Chhattisgarh.",
+        "about_text": "Shri Mahalakshmi Trader is your premier destination for high-precision architectural hardware, locks, designer handles, and carpenter fittings in Bagbahara, Chhattisgarh.",
+        "phone": "+91 95261 62225",
+        "email": "contact@shrimahalakshmitrader.com",
+        "address": "Near Bharat Petrol Pump, Bagbahara, Chhattisgarh - 493449",
+        "gstin": "22AAACH7409R1ZZ",
+        "hours": "Mon - Sat: 9:00 AM - 8:00 PM",
+        "copyright": "© 2026 Shri Mahalakshmi Trader. All Rights Reserved. Precision Engineered.",
+        "top_bar_message_1": "Fast & Reliable Doorstep Delivery",
+        "top_bar_message_2": "100% Genuine Quality Hardware",
+        "top_bar_message_3": "Trusted by 5,000+ Architects & Builders",
+        "top_bar_message_4": "Expert Hardware Consultation"
     }
 }
 

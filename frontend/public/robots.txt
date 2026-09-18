@@ -1,0 +1,21 @@
+# Shri Mahalakshmi Trader — robots.txt
+# https://shrimahalakshmitrader.com
+# Location: Near Bharat Petrol Pump, Bagbahara, Chhattisgarh
+
+User-agent: *
+Allow: /
+Allow: /#categories
+Allow: /#products
+Allow: /#services
+Allow: /#why-us
+
+# Protect internal business dashboards and login portals from search indexation
+Disallow: /admin
+Disallow: /partner
+Disallow: /api/
+Disallow: /docs
+Disallow: /openapi.json
+
+# Host & Sitemap location
+Host: https://shrimahalakshmitrader.com
+Sitemap: https://shrimahalakshmitrader.com/sitemap.xml

@@ -17,6 +17,7 @@ import { CartDrawer } from './components/CartDrawer.jsx';
 import { MobileNavDrawer } from './components/MobileNavDrawer.jsx';
 import { QuickViewModal, QuoteModal } from './components/QuickViewModal.jsx';
 import { SupportWidget, ToastContainer } from './components/SupportWidget.jsx';
+import { DeveloperWatermark } from './components/DeveloperWatermark.jsx';
 import { businessApi } from './api/businessApi';
 import { AdminPanelShell } from './components/layout/AdminPanelShell.jsx';
 import { PartnerPanelShell } from './components/layout/PartnerPanelShell.jsx';
@@ -246,6 +247,7 @@ export default function App() {
           <ToastContainer />
         </>
       )}
+      <DeveloperWatermark />
     </ShopProvider>
   );
 }

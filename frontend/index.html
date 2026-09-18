@@ -1,21 +1,167 @@
+<!--
+================================================================================
+✦ SYSTEM ARCHITECTURE & FULL-STACK ENGINEERING WATERMARK
+Designed, Architected & Developed by: Dipesh Mahakali (@dipeshMahakali)
+Client: Shri Mahalakshmi Trader
+Location: Near Bharat Petrol Pump, Bagbahara, Chhattisgarh - 493449
+Stack: React 19, FastAPI, PostgreSQL (Neon), Vercel Edge Serverless
+================================================================================
+-->
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23141414'/><path d='M30 30h40v40H30z' fill='none' stroke='%23F47B20' stroke-width='8'/><circle cx='50' cy='50' r='10' fill='%23D4AF37'/></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- SEO Meta Tags -->
-    <title>Shree Mahalaxmi Hardware — Premium Hardware Showroom & E-Commerce</title>
-    <meta name="description" content="Discover premium hardware designed for modern homes, offices and professional projects. Biometric smart locks, designer door handles, soft-close hinges, and cabinet fittings at Shree Mahalaxmi Hardware." />
-    <meta name="keywords" content="Shree Mahalaxmi Hardware, door hardware, smart locks, mortise handles, cabinet knobs, hinges, bathroom fittings, architectural hardware" />
-    <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#141414" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <!-- Google Fonts: Plus Jakarta Sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+    <!-- ==========================================================================
+         PRIMARY SEO & SEARCH ENGINE INDEXATION (RANK #1 STRATEGY)
+         ========================================================================== -->
+    <title>Shri Mahalakshmi Trader — Architectural Hardware &amp; Smart Locks | Bagbahara, Chhattisgarh</title>
+    <meta name="title" content="Shri Mahalakshmi Trader — Architectural Hardware &amp; Smart Locks | Bagbahara, Chhattisgarh" />
+    <meta name="description" content="Shri Mahalakshmi Trader near Bharat Petrol Pump, Bagbahara, Chhattisgarh. 5,000+ premium architectural hardware products, biometric smart locks, luxury brass door handles, soft-close hydraulic hinges, and cabinet fittings. Call +91 95261 62225." />
+    <meta name="keywords" content="Shri Mahalakshmi Trader, hardware store Bagbahara, hardware shop near Bharat petrol pump, architectural hardware Chhattisgarh, smart locks Bagbahara, digital door locks, biometric door lock, mortise handles, brass handles, hydraulic hinges, soft close hinges, cabinet knobs, wardrobe fittings, hardware Mahasamund, contractor hardware wholesale Bagbahara" />
+    <meta name="author" content="Dipesh Mahakali | Shri Mahalakshmi Trader" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large" />
+    <link rel="canonical" href="https://shrimahalakshmitrader.com/" />
+
+    <!-- Local Business Geo Meta Tags (Bagbahara, Chhattisgarh Local Pack SEO) -->
+    <meta name="geo.region" content="IN-CT" />
+    <meta name="geo.placename" content="Bagbahara, Chhattisgarh, India" />
+    <meta name="geo.position" content="21.0717;82.3831" />
+    <meta name="ICBM" content="21.0717, 82.3831" />
+
+    <!-- Mobile App & Theme Engine -->
+    <meta name="theme-color" content="#141414" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="SMT Hardware" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Favicon & Touch Icons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!-- ==========================================================================
+         SOCIAL SHARING / OPEN GRAPH (WhatsApp, Facebook, LinkedIn)
+         ========================================================================== -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Shri Mahalakshmi Trader" />
+    <meta property="og:url" content="https://shrimahalakshmitrader.com/" />
+    <meta property="og:title" content="Shri Mahalakshmi Trader — Architectural Hardware &amp; Smart Locks | Bagbahara" />
+    <meta property="og:description" content="Discover 5,000+ luxury door handles, biometric smart locks, soft-close hinges, and designer cabinet fittings near Bharat Petrol Pump, Bagbahara, Chhattisgarh. Call +91 95261 62225." />
+    <meta property="og:image" content="https://shrimahalakshmitrader.com/og-image.svg" />
+    <meta property="og:image:type" content="image/svg+xml" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Shri Mahalakshmi Trader Showroom Bagbahara" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@SMT_Hardware" />
+    <meta name="twitter:url" content="https://shrimahalakshmitrader.com/" />
+    <meta name="twitter:title" content="Shri Mahalakshmi Trader — Hardware &amp; Smart Locks | Bagbahara" />
+    <meta name="twitter:description" content="Biometric smart locks, solid brass mortise handles, hydraulic hinges, and modern cabinet fittings in Bagbahara, Chhattisgarh." />
+    <meta name="twitter:image" content="https://shrimahalakshmitrader.com/og-image.svg" />
+
+    <!-- ==========================================================================
+         PERFORMANCE PRECONNECTS (CORE WEB VITALS OPTIMIZATION)
+         ========================================================================== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
+
+    <!-- ==========================================================================
+         JSON-LD STRUCTURED DATA (GOOGLE RICH SNIPPETS & KNOWLEDGE GRAPH)
+         ========================================================================== -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": ["HardwareStore", "HomeGoodsStore", "LocalBusiness"],
+          "@id": "https://shrimahalakshmitrader.com/#store",
+          "name": "Shri Mahalakshmi Trader",
+          "alternateName": ["Shri Mahalakshmi Hardware", "SMT Bagbahara"],
+          "url": "https://shrimahalakshmitrader.com",
+          "logo": "https://shrimahalakshmitrader.com/favicon.svg",
+          "image": "https://shrimahalakshmitrader.com/og-image.svg",
+          "description": "Premier architectural hardware showroom and trader in Bagbahara, Chhattisgarh located near Bharat Petrol Pump. Specializing in biometric digital locks, designer brass door handles, hydraulic soft-close hinges, and kitchen fittings.",
+          "telephone": "+91-95261-62225",
+          "email": "contact@shrimahalakshmitrader.com",
+          "priceRange": "₹₹ - ₹₹₹",
+          "currenciesAccepted": "INR",
+          "paymentAccepted": "Cash, Credit Card, Debit Card, UPI, Net Banking, Khata Credit",
+          "hasMap": "https://maps.google.com/?q=Shri+Mahalakshmi+Trader+Near+Bharat+Petrol+Pump+Bagbahara+Chhattisgarh",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Near Bharat Petrol Pump",
+            "addressLocality": "Bagbahara",
+            "addressRegion": "Chhattisgarh",
+            "postalCode": "493449",
+            "addressCountry": "IN"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 21.0717,
+            "longitude": 82.3831
+          },
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+              "opens": "09:00",
+              "closes": "20:00"
+            }
+          ],
+          "areaServed": [
+            {
+              "@type": "AdministrativeArea",
+              "name": "Bagbahara"
+            },
+            {
+              "@type": "AdministrativeArea",
+              "name": "Mahasamund"
+            },
+            {
+              "@type": "AdministrativeArea",
+              "name": "Chhattisgarh"
+            },
+            {
+              "@type": "Country",
+              "name": "India"
+            }
+          ],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "348",
+            "bestRating": "5",
+            "worstRating": "1"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://shrimahalakshmitrader.com/#website",
+          "url": "https://shrimahalakshmitrader.com",
+          "name": "Shri Mahalakshmi Trader",
+          "publisher": {
+            "@id": "https://shrimahalakshmitrader.com/#store"
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://shrimahalakshmitrader.com/?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -6,10 +6,6 @@ from app.core.database import Base, engine
 from app.main import app
 
 
-Base.metadata.drop_all(bind=engine)
-Base.metadata.create_all(bind=engine)
-
-
 def test_owner_bill_payment_and_khata_workflow():
     with TestClient(app) as client:
         registration = client.post("/api/v1/auth/register", params={"name": "Shop Owner", "email": "owner@example.com", "password": "strong-password"})

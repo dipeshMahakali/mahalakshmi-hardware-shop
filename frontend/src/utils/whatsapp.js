@@ -4,8 +4,8 @@
  * @param {string} message
  * @returns {string}
  */
-export function buildWhatsAppLink(phone = '919876543210', message = '') {
-  const cleanPhone = phone.replace(/[^0-9]/g, '');
+export function buildWhatsAppLink(phone = '919526162225', message = '') {
+  const cleanPhone = phone.replace(/[^0-9]/g, '') || '919526162225';
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 }
 
@@ -13,14 +13,14 @@ export function buildWhatsAppLink(phone = '919876543210', message = '') {
  * Builds quotation message for a product
  */
 export function formatProductQuoteMessage(product, quantity = 1, note = '') {
-  return `Hello Shree Mahalaxmi Hardware! 👋\n\nI would like to inquire about the following product:\n- Product: ${product.name}\n- SKU: ${product.sku || 'N/A'}\n- Quantity: ${quantity} ${product.unit || 'pcs'}\n${product.price ? `- Estimated Price: ₹${product.price}` : ''}\n${note ? `- Special Requirement: ${note}\n` : ''}\nPlease share availability and commercial quote.`;
+  return `Hello Shri Mahalakshmi Trader! 👋\n\nI would like to inquire about the following product:\n- Product: ${product.name}\n- SKU: ${product.sku || 'N/A'}\n- Quantity: ${quantity} ${product.unit || 'pcs'}\n${product.price ? `- Estimated Price: ₹${product.price}` : ''}\n${note ? `- Special Requirement: ${note}\n` : ''}\nPlease share availability and commercial quote.`;
 }
 
 /**
  * Builds visualizer combination message
  */
 export function formatVisualizerQuoteMessage(doorType, laminate, handle) {
-  return `Hello Shree Mahalaxmi Hardware! 👋\n\nI am interested in this Door & Hardware Combination from your Visualizer:\n- Door Type: ${doorType}\n- Laminate Finish: ${laminate.name} (${laminate.texture})\n- Handle Style: ${handle.name} (${handle.style})\n\nPlease share price, stock availability, and installation details.`;
+  return `Hello Shri Mahalakshmi Trader! 👋\n\nI am interested in this Door & Hardware Combination from your Visualizer:\n- Door Type: ${doorType}\n- Laminate Finish: ${laminate.name} (${laminate.texture})\n- Handle Style: ${handle.name} (${handle.style})\n\nPlease share price, stock availability, and installation details.`;
 }
 
 /**
@@ -28,6 +28,6 @@ export function formatVisualizerQuoteMessage(doorType, laminate, handle) {
  */
 export function formatCarpenterEstimateMessage(project, items = []) {
   const itemsText = items.map(item => `- ${item.name}: ${item.quantity} ${item.unit || 'pcs'}`).join('\n');
-  return `Hello ${project.homeowner_name || 'Sir'}! 👋\n\nHere is the material estimate summary for your project (${project.name}):\n${itemsText || '- Material list attached'}\n\nMaterials supplied by Shree Mahalaxmi Hardware.`;
+  return `Hello ${project.homeowner_name || 'Sir'}! 👋\n\nHere is the material estimate summary for your project (${project.name}):\n${itemsText || '- Material list attached'}\n\nMaterials supplied by Shri Mahalakshmi Trader, Bagbahara.`;
 }
 

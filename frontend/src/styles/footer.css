@@ -212,3 +212,39 @@
     display: block;
   }
 }
+
+/* ==========================================================================
+   DISCREET DEVELOPER SIGNATURE WATERMARK
+   Subtle, sleek, non-distracting for ordinary shoppers, visible upon closer look
+   ========================================================================== */
+.dev-signature-mark {
+  font-size: 11px;
+  color: #71717A;
+  letter-spacing: 0.04em;
+  opacity: 0.55;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding-left: 8px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s ease;
+  user-select: none;
+}
+
+.dev-signature-mark:hover {
+  opacity: 1;
+  color: #CBD5E1;
+}
+
+.dev-mark-author {
+  font-weight: 700;
+  color: #A1A1AA;
+  transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+
+.dev-signature-mark:hover .dev-mark-author {
+  color: #F47B20;
+  text-shadow: 0 0 10px rgba(244, 123, 32, 0.45);
+}
+

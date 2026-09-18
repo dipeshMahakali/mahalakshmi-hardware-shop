@@ -23,6 +23,7 @@ import { formatINR } from '../utils/currency';
 import { CatalogShowcaseManager } from './admin/CatalogShowcaseManager';
 import { StorefrontCMSManager } from './admin/StorefrontCMSManager';
 import { AudienceEngagementManager } from './admin/AudienceEngagementManager';
+import { useShop } from '../context/ShopContext';
 
 export function AdminDashboard({
   token: propToken,
@@ -30,6 +31,7 @@ export function AdminDashboard({
   onTabChange,
   onStatsUpdate
 }) {
+  const { refetchSiteContent } = useShop() || {};
   const [token] = useState(propToken || true);
   const [localActiveTab, setLocalActiveTab] = useState('kpis');
   const currentTab = propActiveTab || localActiveTab;
@@ -1486,7 +1488,10 @@ export function AdminDashboard({
       {currentTab === 'cms' && (
         <StorefrontCMSManager
           token={token}
-          onContentSaved={() => loadDashboardData(token)}
+          onContentSaved={() => {
+            loadDashboardData(token);
+            if (refetchSiteContent) refetchSiteContent();
+          }}
         />
       )}
 

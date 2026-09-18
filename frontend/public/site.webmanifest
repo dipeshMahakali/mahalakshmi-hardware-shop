@@ -1,0 +1,19 @@
+{
+  "name": "Shri Mahalakshmi Trader",
+  "short_name": "SMT Hardware",
+  "description": "Shri Mahalakshmi Trader - Architectural hardware, biometric smart locks, luxury brass door handles, and kitchen fittings near Bharat Petrol Pump, Bagbahara, Chhattisgarh.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#141414",
+  "theme_color": "#F47B20",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["shopping", "business", "home-improvement"]
+}

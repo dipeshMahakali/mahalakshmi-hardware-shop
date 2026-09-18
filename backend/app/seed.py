@@ -9,8 +9,9 @@ from app.models import (
 )
 
 
-def seed_data():
-    Base.metadata.drop_all(bind=engine)
+def seed_data(drop_existing: bool = True):
+    if drop_existing:
+        Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
     db = SessionLocal()
@@ -655,6 +656,8 @@ def seed_data():
 
 
 if __name__ == "__main__":
-    seed_data()
+    import sys
+    force_drop = "--reset" in sys.argv or "--force" in sys.argv
+    seed_data(drop_existing=force_drop)
 
 

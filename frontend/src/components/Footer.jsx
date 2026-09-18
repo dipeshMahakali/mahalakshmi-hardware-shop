@@ -35,14 +35,14 @@ export function Footer() {
                 </div>
                 <div className="logo-text-group">
                   <div className="logo-title">
-                    <span className="logo-title-main">SHREE MAHALAXMI</span>
-                    <span className="logo-title-sub">HARDWARE</span>
+                    <span className="logo-title-main">SHRI MAHALAKSHMI</span>
+                    <span className="logo-title-sub">TRADER</span>
                   </div>
                 </div>
               </a>
               
               <p className="footer-about-text">
-                {footerData.about_text || 'Your trusted destination for premium architectural hardware, fittings, door security, and cabinet accessories. Built for durability and engineered for modern spaces.'}
+                {footerData.about_text || 'Shri Mahalakshmi Trader is your trusted destination for premium architectural hardware, fittings, door security, and cabinet accessories in Bagbahara, Chhattisgarh. Built for durability and engineered for modern spaces.'}
               </p>
 
               <div className="footer-trust-badges">
@@ -96,26 +96,26 @@ export function Footer() {
               <div className="footer-contact-list">
                 <div className="footer-contact-item">
                   <Phone size={18} />
-                  <span>{footerData.phone || '+91 98765 43210'}</span>
+                  <span>{footerData.phone || '+91 95261 62225'}</span>
                 </div>
                 <div className="footer-contact-item">
                   <Mail size={18} />
-                  <span>{footerData.email || 'info@shreemahalaxmihardware.com'}</span>
+                  <span>{footerData.email || 'contact@shrimahalakshmitrader.com'}</span>
                 </div>
                 <div className="footer-contact-item">
                   <MapPin size={18} />
-                  <span>{footerData.address || '123 Hardware Market, City Center, Ahmedabad, Gujarat - 380001'}</span>
+                  <span>{footerData.address || 'Near Bharat Petrol Pump, Bagbahara, Chhattisgarh - 493449'}</span>
                 </div>
                 <div className="footer-contact-item">
                   <Clock size={18} />
-                  <span>{footerData.hours || 'Mon - Sat: 9:00 AM - 7:00 PM'}</span>
+                  <span>{footerData.hours || 'Mon - Sat: 9:00 AM - 8:00 PM'}</span>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="footer-bottom-bar">
-            <div>{footerData.copyright || `© ${new Date().getFullYear()} Shree Mahalaxmi Hardware. All Rights Reserved.`}</div>
+            <div>{footerData.copyright || `© ${new Date().getFullYear()} Shri Mahalakshmi Trader. All Rights Reserved.`}</div>
 
             <div className="payment-badges-row">
               <span className="payment-badge">VISA</span>
@@ -129,6 +129,10 @@ export function Footer() {
               <a href="#privacy" className="footer-legal-link">Privacy Policy</a>
               <a href="#terms" className="footer-legal-link">Terms & Conditions</a>
               <a href="#sitemap" className="footer-legal-link">Sitemap</a>
+              <div className="dev-signature-mark" title="System Architecture &amp; Full-Stack Engineering">
+                <span>Designed &amp; Engineered by </span>
+                <span className="dev-mark-author">Dipesh Patel</span>
+              </div>
             </div>
           </div>
 

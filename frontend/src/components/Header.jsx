@@ -127,7 +127,7 @@ export function Header({ setViewMode, viewMode }) {
             <Menu size={24} />
           </button>
 
-          {/* Logo: SHREE MAHALAXMI HARDWARE */}
+          {/* Logo: SHRI MAHALAKSHMI TRADER */}
           <a 
             href="#home" 
             className="brand-logo" 
@@ -136,15 +136,15 @@ export function Header({ setViewMode, viewMode }) {
               if (navigateToHome) navigateToHome(); 
               else setActiveCategory('home'); 
             }} 
-            title="Shree Mahalaxmi Hardware"
+            title="Shri Mahalakshmi Trader"
           >
             <div className="logo-emblem">
               <ShieldCheck size={24} />
             </div>
             <div className="logo-text-group">
               <div className="logo-title">
-                <span className="logo-title-main">SHREE MAHALAXMI</span>
-                <span className="logo-title-sub">HARDWARE</span>
+                <span className="logo-title-main">SHRI MAHALAKSHMI</span>
+                <span className="logo-title-sub">TRADER</span>
               </div>
             </div>
           </a>

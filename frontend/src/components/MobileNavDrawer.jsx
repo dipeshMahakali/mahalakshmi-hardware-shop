@@ -48,8 +48,8 @@ export function MobileNavDrawer() {
               <ShieldCheck size={20} />
             </div>
             <div>
-              <div className="mobile-drawer-title-main">SHREE MAHALAXMI</div>
-              <div className="mobile-drawer-title-sub">HARDWARE</div>
+              <div className="mobile-drawer-title-main">SHRI MAHALAKSHMI</div>
+              <div className="mobile-drawer-title-sub">TRADER</div>
             </div>
           </div>
 
@@ -133,9 +133,9 @@ export function MobileNavDrawer() {
           </button>
 
           <div className="mobile-drawer-quick-links">
-            <a href="tel:+919876543210" className="mobile-drawer-link-item">
+            <a href="tel:+919526162225" className="mobile-drawer-link-item">
               <Phone size={13} color="#F47B20" />
-              <span>+91 98765 43210</span>
+              <span>+91 95261 62225</span>
             </a>
             <a href="#store-locator" className="mobile-drawer-link-item" onClick={() => setIsMobileNavOpen(false)}>
               <MapPin size={13} color="#F47B20" />

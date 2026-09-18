@@ -15,4 +15,94 @@
 @import './styles/footer.css';
 @import './styles/panels.css';
 
+/* ==========================================================================
+   DISCREET DEVELOPER CORNER WATERMARK
+   ========================================================================== */
+.dev-watermark-seal {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.22;
+  transition: opacity 0.3s ease, transform 0.25s ease;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.dev-watermark-seal:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.dev-seal-mark {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(18, 20, 24, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dev-watermark-seal:hover .dev-seal-mark {
+  border-color: #F47B20;
+  background: #14171D;
+  box-shadow: 0 0 12px rgba(244, 123, 32, 0.35);
+}
+
+.dev-seal-char {
+  font-size: 11px;
+  font-weight: 800;
+  color: #94A3B8;
+  font-family: 'Plus Jakarta Sans', monospace, sans-serif;
+}
+
+.dev-watermark-seal:hover .dev-seal-char {
+  color: #F47B20;
+}
+
+.dev-seal-card {
+  background: rgba(18, 20, 24, 0.95);
+  border: 1px solid rgba(244, 123, 32, 0.4);
+  padding: 6px 12px;
+  border-radius: 6px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  animation: fadeInSeal 0.2s ease-out;
+}
+
+.dev-seal-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.02em;
+}
+
+.dev-seal-desc {
+  font-size: 10px;
+  color: #F47B20;
+  margin-top: 1px;
+}
+
+@keyframes fadeInSeal {
+  from { opacity: 0; transform: translateX(-4px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (max-width: 768px) {
+  .dev-watermark-seal {
+    bottom: 72px; /* Above mobile bottom navigation */
+    left: 8px;
+    opacity: 0.18;
+  }
+}
+
+
 

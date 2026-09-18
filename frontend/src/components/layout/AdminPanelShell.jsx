@@ -74,7 +74,7 @@ export function AdminPanelShell({
           <a className="panel-brand" href="/" title="Back to storefront">
             <span className="panel-brand-mark">SM</span>
             <span>
-              <strong>Shree Mahalaxmi</strong>
+              <strong>Shri Mahalakshmi</strong>
               <small>Owner Command Center</small>
             </span>
           </a>
